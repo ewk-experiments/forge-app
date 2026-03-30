@@ -3246,28 +3246,9 @@ async function startTraining() {
     phaseText.textContent = `UPLOADED ${uploadedCount} IMAGES — STARTING TRAINING`;
     progressFill.style.width = '22%';
     
-    // ── Phase 2: Start training (no images in payload, they're already uploaded) ──
-    const phases = [
-      'PREPARING DATASET',
-      'LOADING BASE MODEL',
-      'TRAINING — EPOCH 1',
-      'TRAINING — EPOCH 2',
-      'TRAINING — LEARNING STYLE',
-      'TRAINING — REFINING WEIGHTS',
-      'SAVING LORA WEIGHTS',
-    ];
-    let progress = 22;
-    let phaseIdx = 0;
-    
-    const progressInterval = setInterval(() => {
-      progress = Math.min(progress + 0.6, 92);
-      progressFill.style.width = progress + '%';
-      const newPhaseIdx = Math.min(Math.floor((progress - 22) / 10), phases.length - 1);
-      if (newPhaseIdx !== phaseIdx) {
-        phaseIdx = newPhaseIdx;
-        phaseText.textContent = phases[phaseIdx];
-      }
-    }, 1000);
+    // ── Phase 2: Start training (async — returns immediately, we poll for status) ──
+    phaseText.textContent = 'STARTING TRAINING';
+    progressFill.style.width = '22%';
     
     const res = await fetch(API.train.start, {
       method: 'POST',
@@ -3281,12 +3262,57 @@ async function startTraining() {
       }),
     });
     
-    clearInterval(progressInterval);
-    const data = await res.json();
+    const startData = await res.json();
     
-    if (data.status === 'success') {
+    if (startData.status === 'error') {
+      progressFill.style.width = '0%';
+      phaseText.textContent = 'FAILED';
+      toast(startData.error || 'Training failed to start');
+      setStatus('error', 'ERROR');
+      return;
+    }
+    
+    // ── Phase 3: Poll for training status ──
+    const pollSessionId = startData.session_id || sessionId;
+    const phaseMap = {
+      'preparing': 'PREPARING DATASET',
+      'loading_model': 'LOADING BASE MODEL',
+      'training': 'TRAINING IN PROGRESS',
+      'saving': 'SAVING LORA WEIGHTS',
+    };
+    
+    let progress = 22;
+    const progressInterval = setInterval(() => {
+      progress = Math.min(progress + 0.3, 92);
+      progressFill.style.width = progress + '%';
+    }, 1000);
+    
+    // Poll every 5 seconds
+    let pollResult = null;
+    while (true) {
+      await new Promise(r => setTimeout(r, 5000));
+      try {
+        const pollRes = await fetch(API.train.start + '/status/' + encodeURIComponent(pollSessionId));
+        pollResult = await pollRes.json();
+        
+        if (pollResult.phase && phaseMap[pollResult.phase]) {
+          phaseText.textContent = phaseMap[pollResult.phase];
+        }
+        
+        if (pollResult.status === 'success' || pollResult.status === 'error') {
+          break;
+        }
+      } catch (e) {
+        // Network blip — keep polling
+        console.log('Poll error, retrying:', e.message);
+      }
+    }
+    
+    clearInterval(progressInterval);
+    
+    if (pollResult.status === 'success') {
       progressFill.style.width = '100%';
-      phaseText.textContent = `COMPLETE — ${data.lora_size ? (data.lora_size / 1024 / 1024).toFixed(1) + ' MB' : 'LoRA saved'}`;
+      phaseText.textContent = `COMPLETE — ${pollResult.lora_size ? (pollResult.lora_size / 1024 / 1024).toFixed(1) + ' MB' : 'LoRA saved'}`;
       state.trainedLora = styleName;
       document.querySelector('.step-tab[data-step="0"]').classList.add('completed');
       document.getElementById('s1Prompt').value = `A futuristic shoe in the style of ${styleName}, product photography, white background`;
@@ -3302,7 +3328,7 @@ async function startTraining() {
     } else {
       progressFill.style.width = '0%';
       phaseText.textContent = 'FAILED';
-      toast(data.error || 'Training failed');
+      toast(pollResult.error || 'Training failed');
       setStatus('error', 'ERROR');
     }
   } catch (err) {

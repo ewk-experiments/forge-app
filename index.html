@@ -3164,6 +3164,12 @@ function renderS0Grid() {
   document.getElementById('s0ImageCount').textContent = `${s0Images.length} images`;
   document.getElementById('s0TrainBtn').disabled = s0Images.length < 5;
   
+  // Auto-scale steps: ~28 passes per image, min 500, max 5000
+  if (s0Images.length >= 5) {
+    const recommended = Math.max(500, Math.min(5000, s0Images.length * 28));
+    document.getElementById('s0Steps').value = recommended;
+  }
+  
   if (s0Images.length === 0) {
     container.style.display = 'none';
     document.getElementById('s0Empty').style.display = '';
@@ -3174,7 +3180,7 @@ async function startTraining() {
   if (s0Images.length < 5) { toast('Need at least 5 images'); return; }
   
   const styleName = document.getElementById('s0StyleName').value.trim() || 'mystyle';
-  const steps = parseInt(document.getElementById('s0Steps').value) || 800;
+  const steps = parseInt(document.getElementById('s0Steps').value) || null;
   const sessionId = 'train_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
   
   setStatus('generating', 'RUNNING');
@@ -3233,7 +3239,7 @@ async function startTraining() {
         images: [],
         session_id: sessionId,
         style_name: styleName,
-        steps: steps,
+        steps: steps || undefined,
         trigger_word: styleName,
       }),
     });

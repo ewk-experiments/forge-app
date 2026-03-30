@@ -1720,7 +1720,13 @@ html, body {
       <button id="s0ToStep1" onclick="event.stopPropagation(); switchStep(1)" style="display:none;position:absolute;bottom:16px;right:16px;padding:6px 14px;background:var(--text);color:var(--bg);border:none;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;cursor:pointer;z-index:6;text-transform:uppercase">→ Generate</button>
     </div>
     <div class="s1-history" style="display:flex;flex-direction:column">
-      <div class="s1-history-label">TRAINING CONFIG</div>
+      <div class="s1-history-label">STYLE LIBRARY</div>
+      <div id="s0Library" style="padding:8px;overflow-y:auto;max-height:180px;scrollbar-width:none">
+        <div id="s0LibraryGrid" style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-label);padding:8px;text-align:center">Loading styles...</div>
+        </div>
+      </div>
+      <div class="s1-history-label" style="border-top:1px solid var(--border)">TRAINING CONFIG</div>
       <div style="padding:16px;display:flex;flex-direction:column;gap:16px;flex:1">
         <div class="param-group">
           <span class="param-label">Style Name<span class="tip-text">A short name for your trained style. Used in prompts.</span></span>
@@ -1848,7 +1854,7 @@ html, body {
       <span class="empty-state" id="s3Empty">Generate views in Step 2<br>then reconstruct here</span>
       <canvas id="s3Canvas" style="display:none"></canvas>
       <canvas id="s3LoadingCanvas" style="display:none;position:absolute;inset:0;z-index:1"></canvas>
-      <button id="s3ToStep4" onclick="switchStep(4)" style="display:none;position:absolute;bottom:16px;right:16px;padding:6px 14px;background:var(--text);color:var(--bg);border:none;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;cursor:pointer;z-index:6;text-transform:uppercase">→ Print-Ready</button>
+      <button id="s3ToStep4" onclick="switchStep(4)" style="display:none;position:absolute;bottom:16px;right:16px;padding:6px 14px;background:var(--text);color:var(--bg);border:none;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;cursor:pointer;z-index:6;text-transform:uppercase">→ Produce</button>
     </div>
     <div class="s3-panel">
       <div class="s3-panel-section" id="s3RefSection" style="display:none">
@@ -3333,14 +3339,13 @@ document.getElementById('s0StyleName').addEventListener('input', (e) => {
 async function fetchAvailableLoras() {
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    const timeout = setTimeout(() => controller.abort(), 10000);
     const res = await fetch(API.train.start + '/loras', { signal: controller.signal });
     clearTimeout(timeout);
     const data = await res.json();
     const select = document.getElementById('s1LoraSelect');
     const currentVal = select.value;
     
-    // Keep "None" option, clear the rest
     select.innerHTML = '<option value="">None</option>';
     
     if (data.loras && data.loras.length > 0) {
@@ -3351,12 +3356,59 @@ async function fetchAvailableLoras() {
         select.appendChild(opt);
       });
       
-      // Restore previous selection or auto-select trained one
       if (currentVal) select.value = currentVal;
       else if (state.trainedLora) select.value = state.trainedLora;
     }
+    
+    // Also update the style library in Step 00
+    renderStyleLibrary(data.loras || []);
   } catch (err) {
     console.log('Could not fetch LoRAs:', err.message);
+    renderStyleLibrary([]);
+  }
+}
+
+function renderStyleLibrary(loras) {
+  const grid = document.getElementById('s0LibraryGrid');
+  if (!grid) return;
+  
+  if (loras.length === 0) {
+    grid.innerHTML = '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-label);padding:8px;text-align:center">No trained styles yet</div>';
+    return;
+  }
+  
+  grid.innerHTML = loras.map(lora => {
+    const date = lora.trained_at ? new Date(lora.trained_at).toLocaleDateString() : '';
+    const thumb = lora.sample_image ? `<img src="${lora.sample_image}" style="width:32px;height:32px;object-fit:cover;flex-shrink:0">` : `<div style="width:32px;height:32px;background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:8px;color:var(--text-label)">--</div>`;
+    return `<div onclick="selectLibraryStyle('${lora.name}')" style="display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--border);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--text)'" onmouseout="this.style.borderColor='var(--border)'">
+      ${thumb}
+      <div style="flex:1;min-width:0;overflow:hidden">
+        <div style="font-family:var(--font-mono);font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${lora.name}</div>
+        <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-label)">${lora.images_used || '?'} imgs / ${lora.steps_trained || '?'} steps${date ? ' / ' + date : ''}</div>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-label);flex-shrink:0">${lora.size_mb}MB</div>
+      <div onclick="event.stopPropagation();deleteStyle('${lora.name}')" style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-label);cursor:pointer;flex-shrink:0" title="Delete">&times;</div>
+    </div>`;
+  }).join('');
+}
+
+function selectLibraryStyle(name) {
+  // Select this style in the Step 1 dropdown and set as active
+  state.trainedLora = name;
+  document.getElementById('s1LoraSelect').value = name;
+  document.getElementById('s0StyleName').value = name;
+  document.getElementById('s0Trigger').value = 'in the style of [' + name + ']';
+  toast('Style "' + name + '" selected — switch to Step 1 to generate');
+}
+
+async function deleteStyle(name) {
+  if (!confirm('Delete style "' + name + '"? This cannot be undone.')) return;
+  try {
+    await fetch(API.train.start + '/loras/' + encodeURIComponent(name), { method: 'DELETE' });
+    toast('Style "' + name + '" deleted');
+    fetchAvailableLoras();
+  } catch (err) {
+    toast('Delete failed: ' + err.message);
   }
 }
 

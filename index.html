@@ -1036,32 +1036,206 @@ html, body {
 }
 
 /* ═══════════════════════════════════════════════════
-   STEP 4 — PRODUCE (Apple-style checkout scroll)
+   STEP 4 — PRODUCE (split layout: fixed left + scroll right)
    ═══════════════════════════════════════════════════ */
-#panel-4 {
-  flex-direction: column;
+.s4-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
   height: calc(100vh - 44px);
+  overflow: hidden;
+}
+
+/* ─── Left Panel (fixed) ─── */
+.s4-left {
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.s4-left::-webkit-scrollbar { display: none; }
+
+.s4-preview {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.s4-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.s4-left-details {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.s4-left-title {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.s4-left-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.s4-left-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.s4-left-key {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--text-label);
+  text-transform: uppercase;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.s4-left-val {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.s4-left-config {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.s4-config-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.s4-config-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--text-label);
+  text-transform: uppercase;
+}
+
+.s4-config-select {
+  padding: 8px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.s4-config-select:focus { border-color: var(--text); outline: none; }
+
+.s4-config-input {
+  padding: 8px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  outline: none;
+}
+
+.s4-config-input:focus { border-color: var(--text); }
+
+.s4-left-actions {
+  margin-top: auto;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.s4-left-btn {
+  padding: 10px 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.s4-left-btn-primary {
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+}
+
+.s4-left-btn-primary:hover { background: var(--accent-active); }
+
+.s4-left-btn-secondary {
+  background: none;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.s4-left-btn-secondary:hover { border-color: var(--text); }
+
+/* ─── Right Panel (scrollable) ─── */
+.s4-right {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .s4-scroll {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden;
   scroll-behavior: smooth;
   scrollbar-width: none;
 }
 
 .s4-scroll::-webkit-scrollbar { display: none; }
 
-/* ─── Sections ─── */
 .s4-section {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 60px 40px;
+  padding: 40px 32px;
   border-bottom: 1px solid var(--border);
 }
 
 .s4-section:last-child { border-bottom: none; }
+
+.s4-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
 
 .s4-section-number {
   font-family: var(--font-mono);
@@ -1069,115 +1243,34 @@ html, body {
   letter-spacing: 0.15em;
   color: var(--text-label);
   text-transform: uppercase;
-  margin-bottom: 8px;
 }
 
 .s4-section-title {
   font-family: var(--font-ui);
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  margin-bottom: 8px;
+  letter-spacing: -0.01em;
 }
 
 .s4-section-subtitle {
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 300;
   color: var(--text-dim);
   line-height: 1.5;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
-/* ─── Hero Section ─── */
-.s4-hero {
-  max-width: 100%;
-  padding: 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.s4-hero-inner {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 60px 40px;
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 48px;
-  align-items: start;
-}
-
-.s4-hero-preview {
-  width: 280px;
-  height: 280px;
-  background: var(--surface);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-}
-
-.s4-hero-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.s4-hero-details {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding-top: 8px;
-}
-
-.s4-hero-title {
-  font-family: var(--font-ui);
-  font-size: 32px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-.s4-hero-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.s4-hero-meta-row {
-  display: flex;
-  gap: 12px;
-  align-items: baseline;
-}
-
-.s4-hero-meta-key {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  color: var(--text-label);
-  text-transform: uppercase;
-  min-width: 80px;
-  flex-shrink: 0;
-}
-
-.s4-hero-meta-val {
-  font-family: var(--font-ui);
-  font-size: 13px;
-  font-weight: 300;
-  color: var(--text-dim);
-}
-
-/* ─── Selection Cards (shared) ─── */
+/* ─── Selection Cards ─── */
 .s4-card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
 }
 
 .s4-card {
   border: 1px solid var(--border);
-  padding: 20px;
+  padding: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
@@ -1191,22 +1284,22 @@ html, body {
 .s4-card.s4-selected {
   border-color: var(--accent-active);
   border-width: 2px;
-  padding: 19px;
+  padding: 15px;
 }
 
 .s4-card.s4-card-alt { border-style: dashed; }
 
 .s4-card-check {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 20px;
-  height: 20px;
+  top: 10px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   color: transparent;
   transition: all 0.2s;
 }
@@ -1219,10 +1312,10 @@ html, body {
 
 .s4-card-name {
   font-family: var(--font-ui);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
-  margin-bottom: 4px;
-  padding-right: 28px;
+  margin-bottom: 3px;
+  padding-right: 24px;
 }
 
 .s4-card-platform {
@@ -1231,29 +1324,29 @@ html, body {
   letter-spacing: 0.15em;
   color: var(--text-label);
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .s4-card-desc {
-  font-size: 12px;
-  line-height: 1.6;
+  font-size: 11px;
+  line-height: 1.5;
   color: var(--text-dim);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .s4-card-tags {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: wrap;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .s4-card-tag {
   font-family: var(--font-mono);
   font-size: 8px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 3px 8px;
+  padding: 2px 6px;
   background: var(--surface);
   color: var(--text-dim);
 }
@@ -1265,14 +1358,14 @@ html, body {
 .s4-card-footer {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding-top: 12px;
+  gap: 12px;
+  padding-top: 10px;
   border-top: 1px solid var(--surface-alt);
 }
 
 .s4-card-price {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -1285,134 +1378,68 @@ html, body {
 .s4-card-link {
   font-family: var(--font-mono);
   font-size: 9px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text);
   text-decoration: none;
   margin-left: auto;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border: 1px solid var(--border);
   transition: all 0.2s;
 }
 
 .s4-card-link:hover { background: var(--text); color: var(--bg); }
 
-/* ─── Config Section (Material, Size) ─── */
-.s4-config-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 24px;
-}
-
-.s4-config-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.s4-config-label {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  color: var(--text-label);
-  text-transform: uppercase;
-}
-
-.s4-config-select {
-  padding: 10px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  cursor: pointer;
-  transition: border-color 0.15s;
-  -webkit-appearance: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-}
-
-.s4-config-select:focus { border-color: var(--text); outline: none; }
-
-.s4-config-input {
-  padding: 10px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.s4-config-input:focus { border-color: var(--text); }
-
-/* ─── Sticky Bottom Bar ─── */
-.s4-bottom-bar {
-  border-top: 1px solid var(--border);
-  background: var(--bg);
+/* ─── Grand Total (sticky bottom of right panel) ─── */
+.s4-total-bar {
+  border-top: 2px solid var(--text);
+  padding: 16px 32px;
   display: flex;
   align-items: center;
-  height: 64px;
-  padding: 0 40px;
+  justify-content: space-between;
+  background: var(--bg);
   flex-shrink: 0;
 }
 
-.s4-bottom-summary {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.s4-bottom-total {
+.s4-total-left {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 12px;
 }
 
-.s4-bottom-total-label {
+.s4-total-label {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.1em;
   color: var(--text-label);
   text-transform: uppercase;
 }
 
-.s4-bottom-total-value {
+.s4-total-value {
   font-family: var(--font-mono);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: var(--text);
+  transition: color 0.2s;
 }
 
-.s4-bottom-total-value.has-value {
+.s4-total-value.has-value {
   color: var(--accent-active);
 }
 
-.s4-bottom-selections {
+.s4-total-chips {
   display: flex;
-  gap: 16px;
+  gap: 8px;
 }
 
-.s4-bottom-chip {
+.s4-total-chip {
   font-family: var(--font-mono);
   font-size: 9px;
-  letter-spacing: 0.05em;
   color: var(--text-dim);
-  padding: 4px 10px;
+  padding: 3px 8px;
   background: var(--surface);
   border: 1px solid var(--border);
 }
-
-.s4-bottom-actions {
-  display: flex;
-  gap: 0;
-  height: 100%;
-}
-
 
 /* ─── Product Badge ─── */
 .product-badge {
@@ -1884,300 +1911,249 @@ html, body {
 
 <!-- Step 4: Produce -->
 <div class="step-panel" id="panel-4">
+  <div class="s4-layout">
 
-  <!-- Scrollable Content -->
-  <div class="s4-scroll" id="s4Scroll">
-
-    <!-- Section 1: Your Design (Hero) -->
-    <div class="s4-hero">
-      <div class="s4-hero-inner">
-        <div class="s4-hero-preview" id="s4Preview">
-          <span class="empty-state" id="s4Empty">Complete Steps 1-3</span>
+    <!-- Left: Fixed Design Summary -->
+    <div class="s4-left">
+      <div class="s4-preview" id="s4Preview">
+        <span class="empty-state" id="s4Empty">Complete Steps 1-3</span>
+      </div>
+      <div class="s4-left-details">
+        <div class="s4-left-title">Production Brief</div>
+        <div class="s4-left-meta" id="s4Meta" style="display:none">
+          <div class="s4-left-row"><span class="s4-left-key">Prompt</span><span class="s4-left-val" id="s4Prompt">--</span></div>
+          <div class="s4-left-row"><span class="s4-left-key">Views</span><span class="s4-left-val" id="s4Views">--</span></div>
+          <div class="s4-left-row"><span class="s4-left-key">3D Model</span><span class="s4-left-val" id="s4Model">--</span></div>
+          <div class="s4-left-row"><span class="s4-left-key">LoRA</span><span class="s4-left-val" id="s4Lora">--</span></div>
         </div>
-        <div class="s4-hero-details">
-          <div class="s4-section-number">Your Design</div>
-          <div class="s4-hero-title" id="s4HeroTitle">Production Brief</div>
-          <div class="s4-hero-meta" id="s4Meta" style="display:none">
-            <div class="s4-hero-meta-row"><span class="s4-hero-meta-key">Prompt</span><span class="s4-hero-meta-val" id="s4Prompt">--</span></div>
-            <div class="s4-hero-meta-row"><span class="s4-hero-meta-key">Views</span><span class="s4-hero-meta-val" id="s4Views">--</span></div>
-            <div class="s4-hero-meta-row"><span class="s4-hero-meta-key">3D Model</span><span class="s4-hero-meta-val" id="s4Model">--</span></div>
-            <div class="s4-hero-meta-row"><span class="s4-hero-meta-key">LoRA</span><span class="s4-hero-meta-val" id="s4Lora">--</span></div>
+        <div class="s4-left-config">
+          <div class="s4-config-group">
+            <span class="s4-config-label">Size (US)</span>
+            <select class="s4-config-select" id="s4Size" onchange="updateGrandTotal()">
+              <option value="8">US 8</option><option value="9">US 9</option><option value="10">US 10</option>
+              <option value="10.5">US 10.5</option><option value="11">US 11</option><option value="11.5">US 11.5</option>
+              <option value="12" selected>US 12</option><option value="12.5">US 12.5</option><option value="13">US 13</option>
+            </select>
           </div>
+          <div class="s4-config-group">
+            <span class="s4-config-label">Material</span>
+            <select class="s4-config-select" id="s4Material" onchange="updateGrandTotal()">
+              <option value="resin-sla">Resin (SLA)</option>
+              <option value="nylon-sls" selected>Nylon PA12 (SLS)</option>
+              <option value="tpu-fdm">TPU Flex (FDM)</option>
+              <option value="resin-dlp">Resin (DLP)</option>
+              <option value="metal-slm">Metal (SLM)</option>
+            </select>
+          </div>
+          <div class="s4-config-group">
+            <span class="s4-config-label">Notes</span>
+            <input type="text" class="s4-config-input" id="s4Notes" placeholder="e.g. smooth matte finish">
+          </div>
+        </div>
+        <div class="s4-left-actions">
+          <button class="s4-left-btn s4-left-btn-primary" id="s4ExportBtn" onclick="exportBrief()">EXPORT BRIEF</button>
+          <button class="s4-left-btn s4-left-btn-secondary" id="s4DownloadGLB" onclick="downloadS4GLB()" style="display:none">DOWNLOAD GLB</button>
         </div>
       </div>
     </div>
 
-    <!-- Section 2: Choose Size & Material -->
-    <div class="s4-section">
-      <div class="s4-section-number">Step 01</div>
-      <div class="s4-section-title">Configure</div>
-      <div class="s4-section-subtitle">Set your target size and preferred printing material.</div>
-      <div class="s4-config-grid">
-        <div class="s4-config-group">
-          <span class="s4-config-label">Size (US)</span>
-          <select class="s4-config-select" id="s4Size" onchange="updateGrandTotal()">
-            <option value="8">US 8</option>
-            <option value="9">US 9</option>
-            <option value="10">US 10</option>
-            <option value="10.5">US 10.5</option>
-            <option value="11">US 11</option>
-            <option value="11.5">US 11.5</option>
-            <option value="12" selected>US 12</option>
-            <option value="12.5">US 12.5</option>
-            <option value="13">US 13</option>
-          </select>
-        </div>
-        <div class="s4-config-group">
-          <span class="s4-config-label">Material</span>
-          <select class="s4-config-select" id="s4Material" onchange="updateGrandTotal()">
-            <option value="resin-sla">Resin (SLA)</option>
-            <option value="nylon-sls" selected>Nylon PA12 (SLS)</option>
-            <option value="tpu-fdm">TPU Flex (FDM)</option>
-            <option value="resin-dlp">Resin (DLP)</option>
-            <option value="metal-slm">Metal (SLM)</option>
-          </select>
-        </div>
-        <div class="s4-config-group">
-          <span class="s4-config-label">Notes</span>
-          <input type="text" class="s4-config-input" id="s4Notes" placeholder="e.g. smooth matte finish">
-        </div>
-      </div>
-    </div>
+    <!-- Right: Scrollable Selections + Total -->
+    <div class="s4-right">
+      <div class="s4-scroll">
 
-    <!-- Section 3: Choose a Modeler -->
-    <div class="s4-section">
-      <div class="s4-section-number">Step 02</div>
-      <div class="s4-section-title">Choose a Modeler</div>
-      <div class="s4-section-subtitle">A modeler will refine your AI-generated mesh into a print-ready file with proper topology, wall thickness, and sizing.</div>
-      <div class="s4-card-grid" id="s4ModelerGrid">
+        <!-- Modelers -->
+        <div class="s4-section">
+          <div class="s4-section-header">
+            <span class="s4-section-number">01</span>
+            <span class="s4-section-title">Choose a Modeler</span>
+          </div>
+          <div class="s4-section-subtitle">A modeler refines your AI mesh into a print-ready file with proper topology, wall thickness, and sizing.</div>
+          <div class="s4-card-grid" id="s4ModelerGrid">
 
-        <div class="s4-card" data-modeler="eliteshoe3d" onclick="selectModeler(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">eliteshoe3d</div>
-          <div class="s4-card-platform">FIVERR</div>
-          <div class="s4-card-desc">Specializes in 3D shoe and footwear modeling. Slippers, boots, heels, sneakers. Print-ready STL, OBJ, FBX output. Revisions included.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">Shoe Specialist</span>
-            <span class="s4-card-tag">STL + OBJ</span>
-            <span class="s4-card-tag">Print-Ready</span>
-          </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">from $50</span>
-            <span class="s4-card-delivery">3-7 days</span>
-            <a class="s4-card-link" href="https://www.fiverr.com/eliteshoe3d" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
-          </div>
-        </div>
+            <div class="s4-card" data-modeler="eliteshoe3d" onclick="selectModeler(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">eliteshoe3d</div>
+              <div class="s4-card-platform">FIVERR</div>
+              <div class="s4-card-desc">Specializes in 3D shoe and footwear modeling. Print-ready STL, OBJ, FBX output. Revisions included.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">Shoe Specialist</span><span class="s4-card-tag">Print-Ready</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">from $50</span><span class="s4-card-delivery">3-7 days</span>
+                <a class="s4-card-link" href="https://www.fiverr.com/eliteshoe3d" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
+              </div>
+            </div>
 
-        <div class="s4-card" data-modeler="thomas3dshoes" onclick="selectModeler(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">thomas3dshoes</div>
-          <div class="s4-card-platform">FIVERR</div>
-          <div class="s4-card-desc">Professional 3D printable shoe models. Custom sneaker concepts, sole designs, full footwear models for prototyping and manufacturing.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">Print-Optimized</span>
-            <span class="s4-card-tag">Prototyping</span>
-            <span class="s4-card-tag">Manufacturing</span>
-          </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">from $75</span>
-            <span class="s4-card-delivery">3-5 days</span>
-            <a class="s4-card-link" href="https://www.fiverr.com/thomas3dshoes" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
-          </div>
-        </div>
+            <div class="s4-card" data-modeler="thomas3dshoes" onclick="selectModeler(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">thomas3dshoes</div>
+              <div class="s4-card-platform">FIVERR</div>
+              <div class="s4-card-desc">Professional 3D printable shoe models. Structured for smooth printing, proper scaling, and realistic form.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">Print-Optimized</span><span class="s4-card-tag">Prototyping</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">from $75</span><span class="s4-card-delivery">3-5 days</span>
+                <a class="s4-card-link" href="https://www.fiverr.com/thomas3dshoes" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
+              </div>
+            </div>
 
-        <div class="s4-card" data-modeler="shoerealistic" onclick="selectModeler(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">shoerealistic</div>
-          <div class="s4-card-platform">FIVERR</div>
-          <div class="s4-card-desc">Production-ready shoe prototypes and STL files. Accurate, detailed models for testing, pitching, or starting your own line.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">Production-Ready</span>
-            <span class="s4-card-tag">Manufacturing</span>
-          </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">from $100</span>
-            <span class="s4-card-delivery">5-7 days</span>
-            <a class="s4-card-link" href="https://www.fiverr.com/shoerealistic" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
-          </div>
-        </div>
+            <div class="s4-card" data-modeler="shoerealistic" onclick="selectModeler(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">shoerealistic</div>
+              <div class="s4-card-platform">FIVERR</div>
+              <div class="s4-card-desc">Production-ready shoe prototypes and STL files for testing, pitching, or starting your own line.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">Production-Ready</span><span class="s4-card-tag">Manufacturing</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">from $100</span><span class="s4-card-delivery">5-7 days</span>
+                <a class="s4-card-link" href="https://www.fiverr.com/shoerealistic" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
+              </div>
+            </div>
 
-        <div class="s4-card" data-modeler="starry_3d" onclick="selectModeler(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">starry_3d</div>
-          <div class="s4-card-platform">FIVERR</div>
-          <div class="s4-card-desc">Custom 3D shoe modeling and footwear design. All models optimized for perfect 3D printing results.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">3D Print Optimized</span>
-            <span class="s4-card-tag">Custom Design</span>
-          </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">from $60</span>
-            <span class="s4-card-delivery">3-7 days</span>
-            <a class="s4-card-link" href="https://www.fiverr.com/starry_3d" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
+            <div class="s4-card" data-modeler="starry_3d" onclick="selectModeler(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">starry_3d</div>
+              <div class="s4-card-platform">FIVERR</div>
+              <div class="s4-card-desc">Custom 3D shoe modeling. All models optimized for perfect 3D printing results.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">3D Print Optimized</span><span class="s4-card-tag">Custom Design</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">from $60</span><span class="s4-card-delivery">3-7 days</span>
+                <a class="s4-card-link" href="https://www.fiverr.com/starry_3d" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
+              </div>
+            </div>
+
+            <div class="s4-card" data-modeler="ethan3dstudio" onclick="selectModeler(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">ethan3dstudio</div>
+              <div class="s4-card-platform">FIVERR</div>
+              <div class="s4-card-desc">Trendy sneakers, stylish heels, futuristic concepts. Attention to detail and creative precision.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">Creative Concepts</span><span class="s4-card-tag">Futuristic</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">from $65</span><span class="s4-card-delivery">3-5 days</span>
+                <a class="s4-card-link" href="https://www.fiverr.com/ethan3dstudio" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
+              </div>
+            </div>
+
+            <div class="s4-card s4-card-alt" data-modeler="rph" onclick="selectModeler(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">RPH Footwear</div>
+              <div class="s4-card-platform">STUDIO</div>
+              <div class="s4-card-desc">Production-grade CAD footwear. Full prototype-to-production pipeline. Higher fidelity.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">CAD/CAM</span><span class="s4-card-tag">Production-Grade</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">from $200</span><span class="s4-card-delivery">7-14 days</span>
+                <a class="s4-card-link" href="https://rphfootwear.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
+              </div>
+            </div>
+
+            <div class="s4-card s4-card-alt" data-modeler="zellerfeld" onclick="selectModeler(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">Zellerfeld</div>
+              <div class="s4-card-platform">MANUFACTURER</div>
+              <div class="s4-card-desc">Fully 3D printed shoes (TPU). End-to-end from file to wearable. Nike Air Max 1000 collab.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">Full Production</span><span class="s4-card-tag">TPU</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">Custom Quote</span><span class="s4-card-delivery">2-4 weeks</span>
+                <a class="s4-card-link" href="https://zellerfeld.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <div class="s4-card" data-modeler="ethan3dstudio" onclick="selectModeler(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">ethan3dstudio</div>
-          <div class="s4-card-platform">FIVERR</div>
-          <div class="s4-card-desc">High-quality, print-ready designs. Trendy sneakers, stylish heels, futuristic concepts. Attention to detail and creative precision.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">Creative Concepts</span>
-            <span class="s4-card-tag">Futuristic</span>
+        <!-- Print Services -->
+        <div class="s4-section">
+          <div class="s4-section-header">
+            <span class="s4-section-number">02</span>
+            <span class="s4-section-title">Choose a Print Service</span>
           </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">from $65</span>
-            <span class="s4-card-delivery">3-5 days</span>
-            <a class="s4-card-link" href="https://www.fiverr.com/ethan3dstudio" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
-          </div>
-        </div>
+          <div class="s4-section-subtitle">Prices estimated per shoe for a size 12 (~30.5cm) print. Actual cost varies by geometry and finish.</div>
+          <div class="s4-card-grid" id="s4PrinterGrid">
 
-        <div class="s4-card s4-card-alt" data-modeler="rph" onclick="selectModeler(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">RPH Footwear</div>
-          <div class="s4-card-platform">STUDIO</div>
-          <div class="s4-card-desc">Production-grade CAD footwear designers. Full prototype-to-production pipeline. Higher price, higher fidelity.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">CAD/CAM</span>
-            <span class="s4-card-tag">Production-Grade</span>
-          </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">from $200</span>
-            <span class="s4-card-delivery">7-14 days</span>
-            <a class="s4-card-link" href="https://rphfootwear.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
-          </div>
-        </div>
+            <div class="s4-card" data-printer="formlabs" onclick="selectPrinter(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">Formlabs (Form Now)</div>
+              <div class="s4-card-platform">ON-DEMAND</div>
+              <div class="s4-card-desc">Professional SLA and SLS materials from the industry leader. Upload STL, pick material and finish, parts delivered in days. Premium resin and nylon PA12.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">SLA / SLS</span><span class="s4-card-tag">Premium Resins</span><span class="s4-card-tag">Nylon PA12</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">$120 - $450/shoe</span><span class="s4-card-delivery">2-5 days</span>
+                <a class="s4-card-link" href="https://now.formlabs.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit</a>
+              </div>
+            </div>
 
-        <div class="s4-card s4-card-alt" data-modeler="zellerfeld" onclick="selectModeler(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">Zellerfeld</div>
-          <div class="s4-card-platform">MANUFACTURER</div>
-          <div class="s4-card-desc">Fully 3D printed shoes (TPU). End-to-end from digital file to wearable product. Made the Nike Air Max 1000 collab.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">Full Production</span>
-            <span class="s4-card-tag">TPU</span>
-            <span class="s4-card-tag">Wearable Output</span>
-          </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">Custom Quote</span>
-            <span class="s4-card-delivery">2-4 weeks</span>
-            <a class="s4-card-link" href="https://zellerfeld.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">View</a>
-          </div>
-        </div>
+            <div class="s4-card" data-printer="shapeways" onclick="selectPrinter(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">Shapeways</div>
+              <div class="s4-card-platform">ON-DEMAND</div>
+              <div class="s4-card-desc">Industrial-scale on-demand printing. Plastics and metals. Prototype to production. Recently relaunched under new ownership.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">SLS / MJF / SLA</span><span class="s4-card-tag">Nylon / Resin / Metal</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">$150 - $500/shoe</span><span class="s4-card-delivery">3-10 days</span>
+                <a class="s4-card-link" href="https://www.shapeways.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit</a>
+              </div>
+            </div>
 
-      </div>
-    </div>
+            <div class="s4-card" data-printer="sculpteo" onclick="selectPrinter(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">Sculpteo</div>
+              <div class="s4-card-platform">ON-DEMAND</div>
+              <div class="s4-card-desc">Wide material library including nylon, resin, and flexible polymers. Pro finishing options available.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">SLS / SLA / MJF</span><span class="s4-card-tag">60+ Materials</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">$120 - $400/shoe</span><span class="s4-card-delivery">3-7 days</span>
+                <a class="s4-card-link" href="https://www.sculpteo.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit</a>
+              </div>
+            </div>
 
-    <!-- Section 4: Choose a Print Service -->
-    <div class="s4-section">
-      <div class="s4-section-number">Step 03</div>
-      <div class="s4-section-title">Choose a Print Service</div>
-      <div class="s4-section-subtitle">Select where to manufacture your shoe. Prices are per shoe for a size 12 (~30.5cm) print.</div>
-      <div class="s4-card-grid" id="s4PrinterGrid">
+            <div class="s4-card" data-printer="jlc3dp" onclick="selectPrinter(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">JLC3DP</div>
+              <div class="s4-card-platform">ON-DEMAND</div>
+              <div class="s4-card-desc">Competitive pricing for shoe-sized prints. TPU, PA12, and resin. Great for budget prototyping.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">TPU / PA12 / Resin</span><span class="s4-card-tag">Budget-Friendly</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">$60 - $250/shoe</span><span class="s4-card-delivery">5-10 days</span>
+                <a class="s4-card-link" href="https://jlc3dp.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit</a>
+              </div>
+            </div>
 
-        <div class="s4-card" data-printer="shapeways" onclick="selectPrinter(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">Shapeways</div>
-          <div class="s4-card-platform">ON-DEMAND</div>
-          <div class="s4-card-desc">Industrial-scale on-demand 3D printing. Plastics and metals. Prototype to production at 1 to 10,000+ parts. Recently relaunched under new ownership.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">SLS / MJF / SLA</span>
-            <span class="s4-card-tag">Nylon / Resin / Metal</span>
-          </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">$150 - $500/shoe</span>
-            <span class="s4-card-delivery">3-10 days</span>
-            <a class="s4-card-link" href="https://www.shapeways.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit</a>
-          </div>
-        </div>
+            <div class="s4-card" data-printer="protolabs" onclick="selectPrinter(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">Protolabs</div>
+              <div class="s4-card-platform">INDUSTRIAL</div>
+              <div class="s4-card-desc">Enterprise-grade prototyping with DFM analysis. Smooth surfaces and fine features. Highest reliability.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">SLA / SLS</span><span class="s4-card-tag">Enterprise</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">$250 - $700/shoe</span><span class="s4-card-delivery">1-7 days</span>
+                <a class="s4-card-link" href="https://www.protolabs.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit</a>
+              </div>
+            </div>
 
-        <div class="s4-card" data-printer="sculpteo" onclick="selectPrinter(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">Sculpteo</div>
-          <div class="s4-card-platform">ON-DEMAND</div>
-          <div class="s4-card-desc">Professional online 3D printing with wide material library including nylon, resin, and flexible polymers. Pro finishing options.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">SLS / SLA / MJF</span>
-            <span class="s4-card-tag">60+ Materials</span>
-          </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">$120 - $400/shoe</span>
-            <span class="s4-card-delivery">3-7 days</span>
-            <a class="s4-card-link" href="https://www.sculpteo.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit</a>
-          </div>
-        </div>
+            <div class="s4-card" data-printer="raymankind" onclick="selectPrinter(this)">
+              <div class="s4-card-check">&#10003;</div>
+              <div class="s4-card-name">Raymankind</div>
+              <div class="s4-card-platform">FOOTWEAR SPECIALIST</div>
+              <div class="s4-card-desc">Specializes in 3D printing shoes, insoles, outsoles, parts and accessories. Cutting-edge footwear production.</div>
+              <div class="s4-card-tags"><span class="s4-card-tag">Footwear-Specific</span><span class="s4-card-tag">Production</span></div>
+              <div class="s4-card-footer">
+                <span class="s4-card-price">Custom Quote</span><span class="s4-card-delivery">Varies</span>
+                <a class="s4-card-link" href="https://raymankind.com/applications/3d-printed-shoes/" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit</a>
+              </div>
+            </div>
 
-        <div class="s4-card" data-printer="jlc3dp" onclick="selectPrinter(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">JLC3DP</div>
-          <div class="s4-card-platform">ON-DEMAND</div>
-          <div class="s4-card-desc">Competitive pricing for shoe-sized prints. Wide material selection including TPU, PA12, and resin. Great for prototyping.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">TPU / PA12 / Resin</span>
-            <span class="s4-card-tag">Budget-Friendly</span>
-          </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">$60 - $250/shoe</span>
-            <span class="s4-card-delivery">5-10 days</span>
-            <a class="s4-card-link" href="https://jlc3dp.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit</a>
-          </div>
-        </div>
-
-        <div class="s4-card" data-printer="protolabs" onclick="selectPrinter(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">Protolabs</div>
-          <div class="s4-card-platform">INDUSTRIAL</div>
-          <div class="s4-card-desc">Enterprise-grade prototyping with DFM analysis. Smooth surface finishes and fine features. Highest reliability.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">SLA / SLS</span>
-            <span class="s4-card-tag">Enterprise</span>
-          </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">$250 - $700/shoe</span>
-            <span class="s4-card-delivery">1-7 days</span>
-            <a class="s4-card-link" href="https://www.protolabs.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit</a>
-          </div>
-        </div>
-
-        <div class="s4-card" data-printer="raymankind" onclick="selectPrinter(this)">
-          <div class="s4-card-check">&#10003;</div>
-          <div class="s4-card-name">Raymankind</div>
-          <div class="s4-card-platform">FOOTWEAR SPECIALIST</div>
-          <div class="s4-card-desc">Specializes in 3D printing shoes, insoles, outsoles, parts and accessories. Cutting-edge footwear production.</div>
-          <div class="s4-card-tags">
-            <span class="s4-card-tag">Footwear-Specific</span>
-            <span class="s4-card-tag">Production</span>
-          </div>
-          <div class="s4-card-footer">
-            <span class="s4-card-price">Custom Quote</span>
-            <span class="s4-card-delivery">Varies</span>
-            <a class="s4-card-link" href="https://raymankind.com/applications/3d-printed-shoes/" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit</a>
           </div>
         </div>
 
       </div>
+
+      <!-- Sticky Grand Total Bar -->
+      <div class="s4-total-bar">
+        <div class="s4-total-left">
+          <span class="s4-total-label">Estimated Total</span>
+          <span class="s4-total-value" id="s4BottomTotal">--</span>
+        </div>
+        <div class="s4-total-chips" id="s4BottomChips"></div>
+      </div>
     </div>
 
-    <!-- Spacer for bottom bar -->
-    <div style="height:80px"></div>
   </div>
-
-  <!-- Sticky Bottom Bar -->
-  <div class="s4-bottom-bar">
-    <div class="s4-bottom-summary">
-      <div class="s4-bottom-total">
-        <span class="s4-bottom-total-label">Estimated Total</span>
-        <span class="s4-bottom-total-value" id="s4BottomTotal">--</span>
-      </div>
-      <div class="s4-bottom-selections" id="s4BottomChips"></div>
-    </div>
-    <div class="s4-bottom-actions" style="display:flex;gap:0;height:100%">
-      <button class="btn-outline" id="s4DownloadGLB" onclick="downloadS4GLB()" style="display:none;height:100%;white-space:nowrap">Download GLB</button>
-      <button class="btn-generate" id="s4ExportBtn" onclick="exportBrief()" style="height:100%">EXPORT BRIEF</button>
-    </div>
-  </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
@@ -3517,6 +3493,17 @@ const printerPricing = {
     },
     default: { min: 250, max: 700 },
   },
+  formlabs: {
+    name: 'Formlabs',
+    materials: {
+      'resin-sla': { min: 150, max: 450 },
+      'nylon-sls': { min: 120, max: 350 },
+      'tpu-fdm': { min: 100, max: 300 },
+      'resin-dlp': { min: 150, max: 450 },
+      'metal-slm': { min: 500, max: 1200 },
+    },
+    default: { min: 120, max: 450 },
+  },
   raymankind: {
     name: 'Raymankind',
     materials: {},
@@ -3618,7 +3605,6 @@ function updateS4Summary() {
   const hasContent = state.s1.selectedIndex >= 0 || state.s3.glbBlob;
   if (!hasContent) return;
 
-  // Show preview image
   if (state.s1.selectedIndex >= 0 && state.s1.images[state.s1.selectedIndex]) {
     const img = document.createElement('img');
     img.src = state.s1.images[state.s1.selectedIndex];
@@ -3627,7 +3613,6 @@ function updateS4Summary() {
     preview.appendChild(img);
   }
 
-  // Populate hero meta
   const promptEl = document.getElementById('s1Prompt');
   document.getElementById('s4Prompt').textContent = promptEl ? (promptEl.value || '--') : '--';
   
@@ -3644,7 +3629,7 @@ function updateS4Summary() {
   document.getElementById('s4Empty').style.display = 'none';
 
   if (state.s3.glbBlob) {
-    document.getElementById('s4DownloadGLB').style.display = 'inline-block';
+    document.getElementById('s4DownloadGLB').style.display = 'block';
   }
   
   updateGrandTotal();

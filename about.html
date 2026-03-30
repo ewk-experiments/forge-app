@@ -336,26 +336,26 @@ html, body {
     </div>
   </div>
 
-  <div class="section-label">Post-Processing</div>
+  <div class="section-label">Production</div>
 
   <div class="model-card">
     <div class="model-card-header">
-      <span class="model-name">Print-Ready Pipeline</span>
-      <span class="model-role">Step 04 / Scale + Repair + Export</span>
+      <span class="model-name">Produce</span>
+      <span class="model-role">Step 04 / Handoff + Brief Export</span>
     </div>
     <div class="model-body">
       <p class="model-desc">
-        Prepares 3D models for physical fabrication. Scales mesh to target shoe size (US 8-13), flattens the sole for proper contact surface, fills holes, repairs normals, and exports watertight STL for 3D printing. Runs on CPU-only infrastructure.
+        Packages the design into a production brief for human modelers and print services. Includes curated directory of vetted footwear 3D modelers (Fiverr, studios), real print service cost estimates across SLA/SLS/FDM/MJF, and a structured .md export that agents can use to commission and manage the refinement + printing pipeline.
       </p>
       <div class="model-meta">
-        <span class="model-meta-key">Stack</span>
-        <span class="model-meta-val">Trimesh + NumPy + fast_simplification</span>
-        <span class="model-meta-key">Input</span>
-        <span class="model-meta-val">GLB from Step 03</span>
         <span class="model-meta-key">Output</span>
-        <span class="model-meta-val">STL (print-ready, watertight)</span>
-        <span class="model-meta-key">Sizing</span>
-        <span class="model-meta-val">US 8-13 (25.7-31.8 cm)</span>
+        <span class="model-meta-val">Markdown brief + GLB + concept renders</span>
+        <span class="model-meta-key">Modelers</span>
+        <span class="model-meta-val">Curated Fiverr + studio directory</span>
+        <span class="model-meta-key">Print Services</span>
+        <span class="model-meta-val">Shapeways, Sculpteo, JLC3DP, Protolabs</span>
+        <span class="model-meta-key">Agent-Ready</span>
+        <span class="model-meta-val">Structured .md for autonomous commissioning</span>
       </div>
     </div>
   </div>
@@ -389,7 +389,7 @@ html, body {
     </div>
     <div class="model-body">
       <p class="model-desc">
-        Browser-based 3D rendering with orbit controls, studio lighting (key + fill + rim), and PBR material support. Loads GLB models directly for interactive inspection. Used in both Step 3 (reconstruction preview) and Step 4 (print-ready preview).
+        Browser-based 3D rendering with orbit controls, studio lighting (key + fill + rim), and PBR material support. Loads GLB models directly for interactive inspection in Step 3 (reconstruction preview).
       </p>
       <div class="model-meta">
         <span class="model-meta-key">Version</span>

@@ -1671,9 +1671,418 @@ html, body {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ─── Auth Overlay — Premium Brutalist ─── */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: #FAFAFA;
+  z-index: 99999;
+  overflow: hidden;
+}
+
+.auth-overlay.hidden { display: none; }
+
+#authCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.auth-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  scroll-snap-type: y mandatory;
+}
+
+.auth-content::-webkit-scrollbar { display: none; }
+
+.auth-hero {
+  height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  padding: 60px;
+  scroll-snap-align: start;
+}
+
+.auth-hero-text {
+  max-width: 500px;
+}
+
+.auth-hero-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-label);
+  margin-bottom: 12px;
+}
+
+.auth-hero-title {
+  font-family: var(--font-ui);
+  font-size: 72px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.auth-hero-sub {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.auth-scroll-hint {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.4;
+  transition: opacity 0.5s;
+}
+
+.auth-scroll-hint.faded { opacity: 0; }
+
+.auth-scroll-line {
+  width: 1px;
+  height: 40px;
+  background: var(--text);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-scroll-line::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  left: 0;
+  width: 1px;
+  height: 40px;
+  background: var(--accent-active);
+  animation: scrollPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0% { top: -40px; }
+  100% { top: 40px; }
+}
+
+.auth-login-section {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 80px;
+  scroll-snap-align: start;
+  background: rgba(250, 250, 250, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 0 60px;
+}
+
+/* ─── Pipeline Diagram ─── */
+.auth-pipeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 280px;
+}
+
+.auth-pipeline-title {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-label);
+  margin-bottom: 28px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.auth-pipe-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+}
+
+.auth-pipe-line {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 24px;
+}
+
+.auth-pipe-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--text);
+  flex-shrink: 0;
+}
+
+.auth-pipe-connector {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+}
+
+.auth-pipe-info {
+  padding-bottom: 28px;
+}
+
+.auth-pipe-step:last-child .auth-pipe-info {
+  padding-bottom: 0;
+}
+
+.auth-pipe-step:last-child .auth-pipe-connector {
+  display: none;
+}
+
+.auth-pipe-num {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 0.15em;
+  color: var(--text-label);
+  margin-bottom: 3px;
+}
+
+.auth-pipe-name {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: 0.01em;
+}
+
+.auth-pipe-desc {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 300;
+  color: var(--text-dim);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+
+.auth-box {
+  width: 360px;
+  padding: 48px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.auth-box-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-label);
+  margin-bottom: 8px;
+}
+
+.auth-title {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 28px;
+  letter-spacing: -0.01em;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.auth-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--text-label);
+  text-transform: uppercase;
+}
+
+.auth-input {
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+}
+
+.auth-input:focus { border-color: var(--text); }
+
+.auth-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.15s;
+}
+
+.auth-btn:hover { background: var(--accent-active); }
+.auth-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.auth-switch {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-label);
+  text-align: center;
+  margin-top: 16px;
+}
+
+.auth-switch a {
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.auth-error {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent-active);
+  margin-top: 8px;
+  min-height: 14px;
+}
+
+/* ─── Account menu ─── */
+.account-menu {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-label);
+  cursor: pointer;
+  padding: 0 8px;
+  transition: color 0.15s;
+}
+
+.account-menu:hover { color: var(--text); }
 </style>
 </head>
 <body>
+
+<!-- Auth Overlay — Premium Brutalist -->
+<div class="auth-overlay" id="authOverlay">
+  <!-- 3D Model Background (with image fallback) -->
+  <canvas id="authCanvas"></canvas>
+  
+  <!-- Scroll indicator -->
+  <div class="auth-scroll-hint" id="authScrollHint">
+    <div class="auth-scroll-line"></div>
+  </div>
+
+  <!-- Content Layer -->
+  <div class="auth-content">
+    <!-- Hero Section (first viewport) -->
+    <div class="auth-hero">
+      <div class="auth-hero-text">
+        <div class="auth-hero-label">ewk labs</div>
+        <div class="auth-hero-title">FORGE</div>
+        <div class="auth-hero-sub"></div>
+      </div>
+    </div>
+
+    <!-- Login Section (second viewport, scrolls into view) -->
+    <div class="auth-login-section">
+      <!-- Pipeline Diagram — Technical Spec -->
+      <div class="auth-pipeline">
+        <div class="auth-pipeline-title">Pipeline Architecture</div>
+
+        <div class="auth-pipe-step">
+          <div class="auth-pipe-line"><div class="auth-pipe-dot"></div><div class="auth-pipe-connector"></div></div>
+          <div class="auth-pipe-info">
+            <div class="auth-pipe-num">STEP 00</div>
+            <div class="auth-pipe-name">LoRA Training</div>
+            <div class="auth-pipe-desc">FLUX.2 Klein 4B + DreamBooth LoRA fine-tuning. ~28 passes/image on A100 80GB. Rank-16 adapter weights. Custom style embedding from 20-150 reference images.</div>
+          </div>
+        </div>
+
+        <div class="auth-pipe-step">
+          <div class="auth-pipe-line"><div class="auth-pipe-dot"></div><div class="auth-pipe-connector"></div></div>
+          <div class="auth-pipe-info">
+            <div class="auth-pipe-num">STEP 01</div>
+            <div class="auth-pipe-name">Latent Diffusion</div>
+            <div class="auth-pipe-desc">Text-conditioned image synthesis via FLUX.2 Klein 4B with LoRA injection. 4-step inference, 1024x1024px output. CFG-free architecture.</div>
+          </div>
+        </div>
+
+        <div class="auth-pipe-step">
+          <div class="auth-pipe-line"><div class="auth-pipe-dot"></div><div class="auth-pipe-connector"></div></div>
+          <div class="auth-pipe-info">
+            <div class="auth-pipe-num">STEP 02</div>
+            <div class="auth-pipe-name">Multi-View Synthesis</div>
+            <div class="auth-pipe-desc">FLUX Kontext-guided view generation. Orthographic projections: front, back, top, bottom. Structural consistency enforced via reference conditioning.</div>
+          </div>
+        </div>
+
+        <div class="auth-pipe-step">
+          <div class="auth-pipe-line"><div class="auth-pipe-dot"></div><div class="auth-pipe-connector"></div></div>
+          <div class="auth-pipe-info">
+            <div class="auth-pipe-num">STEP 03</div>
+            <div class="auth-pipe-name">3D Reconstruction</div>
+            <div class="auth-pipe-desc">Hunyuan3D-2.1 sparse-view reconstruction. Neural implicit surface → marching cubes extraction. Octree resolution 256-768. PBR material estimation. GLB output.</div>
+          </div>
+        </div>
+
+        <div class="auth-pipe-step">
+          <div class="auth-pipe-line"><div class="auth-pipe-dot"></div></div>
+          <div class="auth-pipe-info">
+            <div class="auth-pipe-num">STEP 04</div>
+            <div class="auth-pipe-name">Production</div>
+            <div class="auth-pipe-desc">Mesh refinement pipeline. Retopology, wall thickness analysis, print-readiness verification. SLS/SLA/FDM/MJF fabrication. PA12, TPU, resin substrates.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sign In -->
+      <div class="auth-box">
+        <div class="auth-box-label">ENTER</div>
+        <div class="auth-title" id="authTitle">Sign In</div>
+        <div class="auth-field">
+          <span class="auth-label">Email</span>
+          <input type="email" class="auth-input" id="authEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <span class="auth-label">Password</span>
+          <input type="password" class="auth-input" id="authPassword" placeholder="6+ characters" autocomplete="current-password">
+        </div>
+        <button class="auth-btn" id="authBtn" onclick="handleAuth()">SIGN IN</button>
+        <div class="auth-error" id="authError"></div>
+        <div class="auth-switch" id="authSwitch">
+          No account? <a onclick="toggleAuthMode()">Create one</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Top Bar -->
 <div class="topbar">
@@ -1702,7 +2111,7 @@ html, body {
     </div>
   </div>
   <div class="topbar-status">
-    <a href="/about.html" style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-label);text-decoration:none;margin-right:16px">ABOUT</a>
+    <span class="account-menu" id="accountMenu" onclick="handleLogout()" title="Sign Out"></span><a href="/about.html" style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-label);text-decoration:none;margin-right:16px">ABOUT</a>
     <span class="status-dot ready" id="statusDot"></span>
     <span id="statusText">IDLE</span>
   </div>
@@ -1748,7 +2157,7 @@ html, body {
         <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-label);line-height:1.6;margin-top:8px" id="s0Info">
           Training teaches the model your design language. After training, Step 1 will generate shoes in your style.
           <br><br>
-          Estimated time: ~15 min on A100
+          <span id="s0TimeEstimate">Estimated time: ~15 min on A100</span>
         </div>
       </div>
     </div>
@@ -2171,27 +2580,21 @@ html, body {
 <!-- JSZip for export bundle -->
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+<!-- Three.js (r145 — last version with UMD addon builds) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.145.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/DRACOLoader.js"></script>
+<script>
+  if (window.THREE && THREE.OrbitControls && THREE.GLTFLoader) {
+    window.OrbitControls = THREE.OrbitControls;
+    window.GLTFLoader = THREE.GLTFLoader;
+    window.__threeReady = true;
+    console.log('Three.js r145 loaded');
+  } else {
+    console.error('Three.js failed to load');
+    window.__threeReady = false;
   }
-}
-</script>
-<script type="module">
-try {
-  const THREE = await import('three');
-  const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
-  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-  window.THREE = THREE;
-  window.OrbitControls = OrbitControls;
-  window.GLTFLoader = GLTFLoader;
-  window.__threeReady = true;
-} catch(e) {
-  console.error('Three.js load failed:', e);
-  window.__threeReady = false;
-}
 </script>
 
 <script>
@@ -2214,7 +2617,7 @@ const API = {
     process: 'https://heyitskim-ai--forge-postprocess-postprocessservice-serve.modal.run',
   },
   train: {
-    start: 'https://heyitskim-ai--forge-train-trainservice-serve.modal.run',
+    start: 'https://heyitskim-ai--forge-train-dev-trainservice-serve.modal.run',
   }
 };
 
@@ -2729,9 +3132,9 @@ function initThreeViewer() {
   threeRenderer.setPixelRatio(window.devicePixelRatio);
   threeRenderer.toneMapping = THREE.ACESFilmicToneMapping;
   threeRenderer.toneMappingExposure = 1.2;
-  threeRenderer.outputColorSpace = THREE.SRGBColorSpace;
+  threeRenderer.outputEncoding = THREE.sRGBEncoding;
 
-  threeControls = new window.OrbitControls(threeCamera, threeRenderer.domElement);
+  threeControls = new THREE.OrbitControls(threeCamera, threeRenderer.domElement);
   threeControls.enableDamping = true;
   threeControls.dampingFactor = 0.1;
 
@@ -2866,14 +3269,14 @@ async function generateStep3() {
     state.s3.glbBlob = new Blob([arr], { type: 'model/gltf-binary' });
 
     const url = URL.createObjectURL(state.s3.glbBlob);
-    const loader = new window.GLTFLoader();
+    const loader = new THREE.GLTFLoader();
 
     if (state.s3.scene) threeScene.remove(state.s3.scene);
 
     loader.load(url, (gltf) => {
       state.s3.scene = gltf.scene;
       
-      // Apply a clean clay-like material — force double-sided to handle flipped normals
+      // Apply dark matte material
       const material = new THREE.MeshStandardMaterial({
         color: 0x1a1a1a,
         roughness: 0.85,
@@ -3180,6 +3583,10 @@ function renderS0Grid() {
   if (s0Images.length >= 5) {
     const recommended = Math.max(500, Math.min(5000, s0Images.length * 28));
     document.getElementById('s0Steps').value = recommended;
+    // Update time estimate (~5 sec per step on A100)
+    const minutes = Math.round(recommended * 5 / 60);
+    var timeEl = document.getElementById('s0TimeEstimate');
+    if (timeEl) timeEl.textContent = 'Estimated time: ~' + minutes + ' min on A100 (' + recommended + ' steps)';
   }
   
   if (s0Images.length === 0) {
@@ -3374,9 +3781,15 @@ async function fetchAvailableLoras() {
   }
 }
 
+// Store lora data for later reference
+var _loraData = {};
+
 function renderStyleLibrary(loras) {
   const grid = document.getElementById('s0LibraryGrid');
   if (!grid) return;
+  
+  // Store for selectLibraryStyle
+  loras.forEach(l => { _loraData[l.name] = l; });
   
   if (loras.length === 0) {
     grid.innerHTML = '<div style="font-family:var(--font-mono);font-size:9px;color:var(--text-label);padding:8px;text-align:center">No trained styles yet</div>';
@@ -3386,14 +3799,17 @@ function renderStyleLibrary(loras) {
   grid.innerHTML = loras.map(lora => {
     const date = lora.trained_at ? new Date(lora.trained_at).toLocaleDateString() : '';
     const thumb = lora.sample_image ? `<img src="${lora.sample_image}" style="width:32px;height:32px;object-fit:cover;flex-shrink:0">` : `<div style="width:32px;height:32px;background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:8px;color:var(--text-label)">--</div>`;
+    const sharedBadge = lora.shared ? '<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:0.1em;color:var(--accent-active);padding:1px 4px;border:1px solid var(--accent-active);flex-shrink:0">PRESET</span>' : '';
+    const deleteBtn = lora.shared ? '' : `<div onclick="event.stopPropagation();deleteStyle('${lora.name}')" style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-label);cursor:pointer;flex-shrink:0" title="Delete">&times;</div>`;
     return `<div onclick="selectLibraryStyle('${lora.name}')" style="display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--border);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--text)'" onmouseout="this.style.borderColor='var(--border)'">
       ${thumb}
       <div style="flex:1;min-width:0;overflow:hidden">
         <div style="font-family:var(--font-mono);font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${lora.name}</div>
         <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-label)">${lora.images_used || '?'} imgs / ${lora.steps_trained || '?'} steps${date ? ' / ' + date : ''}</div>
       </div>
+      ${sharedBadge}
       <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-label);flex-shrink:0">${lora.size_mb}MB</div>
-      <div onclick="event.stopPropagation();deleteStyle('${lora.name}')" style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-label);cursor:pointer;flex-shrink:0" title="Delete">&times;</div>
+      ${deleteBtn}
     </div>`;
   }).join('');
 }
@@ -3404,7 +3820,21 @@ function selectLibraryStyle(name) {
   document.getElementById('s1LoraSelect').value = name;
   document.getElementById('s0StyleName').value = name;
   document.getElementById('s0Trigger').value = 'in the style of [' + name + ']';
-  toast('Style "' + name + '" selected — switch to Step 1 to generate');
+  
+  // Show training images in the left panel
+  var lora = _loraData[name];
+  if (lora && lora.training_images && lora.training_images.length > 0) {
+    var grid = document.getElementById('s0ImageGrid');
+    var container = document.getElementById('s0Grid');
+    container.style.display = 'block';
+    document.getElementById('s0Empty').style.display = 'none';
+    grid.innerHTML = lora.training_images.map(function(img) {
+      return '<div style="aspect-ratio:1;background:var(--surface);border:1px solid var(--border);overflow:hidden"><img src="' + img + '" style="width:100%;height:100%;object-fit:cover"></div>';
+    }).join('');
+    document.getElementById('s0ImageCount').textContent = lora.training_images.length + ' images (from saved style)';
+  }
+  
+  toast('Style "' + name + '" loaded');
 }
 
 async function deleteStyle(name) {
@@ -3998,6 +4428,7 @@ function downloadLightbox() {
 
 // Pan with mouse drag
 const lbInner = document.getElementById('lightboxInner');
+if (lbInner) {
 lbInner.addEventListener('mousedown', (e) => {
   if (lbScale <= 1) return;
   lbDragging = true;
@@ -4005,6 +4436,7 @@ lbInner.addEventListener('mousedown', (e) => {
   lbStartY = e.clientY - lbY * lbScale;
   e.preventDefault();
 });
+}
 
 window.addEventListener('mousemove', (e) => {
   if (!lbDragging) return;
@@ -4016,7 +4448,7 @@ window.addEventListener('mousemove', (e) => {
 window.addEventListener('mouseup', () => { lbDragging = false; });
 
 // Zoom with scroll wheel
-document.getElementById('lightbox').addEventListener('wheel', (e) => {
+document.getElementById('lightbox')?.addEventListener('wheel', (e) => {
   e.preventDefault();
   zoomLightbox(e.deltaY < 0 ? 1.15 : 0.87);
 }, { passive: false });
@@ -4049,6 +4481,350 @@ document.querySelectorAll('.view-cell').forEach(cell => {
     }
   });
 });
+
+
+// ═══════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════
+var authMode = 'login'; // 'login' or 'signup'
+var authToken = localStorage.getItem('forge_token') || null;
+var authUser = JSON.parse(localStorage.getItem('forge_user') || 'null');
+
+function initAuth() {
+  if (authToken && authUser) {
+    // Verify token is still valid (with timeout for cold start)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    fetch(API.train.start + '/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + authToken },
+      signal: controller.signal,
+    }).then(r => {
+      clearTimeout(timeout);
+      if (r.ok) {
+        r.json().then(data => {
+          showApp(data.email);
+        });
+      } else {
+        localStorage.removeItem('forge_token');
+        localStorage.removeItem('forge_user');
+        authToken = null;
+        authUser = null;
+        showAuth();
+      }
+    }).catch(() => {
+      clearTimeout(timeout);
+      // Cold start or network issue — clear stale token, show auth
+      localStorage.removeItem('forge_token');
+      localStorage.removeItem('forge_user');
+      authToken = null;
+      authUser = null;
+      showAuth();
+    });
+  } else {
+    showAuth();
+  }
+}
+
+function showAuth() {
+  document.getElementById('authOverlay').classList.remove('hidden');
+}
+
+function showApp(email) {
+  document.getElementById('authOverlay').classList.add('hidden');
+  destroyAuth3D();
+  document.getElementById('accountMenu').textContent = email.split('@')[0].toUpperCase();
+}
+
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'signup' : 'login';
+  document.getElementById('authTitle').textContent = authMode === 'login' ? 'Sign In' : 'Create Account';
+  document.getElementById('authBtn').textContent = authMode === 'login' ? 'SIGN IN' : 'CREATE ACCOUNT';
+  document.getElementById('authSwitch').innerHTML = authMode === 'login'
+    ? 'No account? <a onclick="toggleAuthMode()">Create one</a>'
+    : 'Have an account? <a onclick="toggleAuthMode()">Sign in</a>';
+  document.getElementById('authError').textContent = '';
+}
+
+async function handleAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const errorEl = document.getElementById('authError');
+  const btn = document.getElementById('authBtn');
+  
+  // Determine mode from button text
+  const isSignup = btn.textContent.includes('CREATE');
+  const mode = isSignup ? 'signup' : 'login';
+  
+  if (!email || !password) { errorEl.textContent = 'Email and password required'; return; }
+  if (password.length < 6) { errorEl.textContent = 'Password must be 6+ characters'; return; }
+  
+  btn.disabled = true;
+  btn.textContent = 'LOADING...';
+  errorEl.textContent = '';
+  
+  try {
+    const endpoint = mode === 'login' ? '/auth/login' : '/auth/signup';
+    let res;
+    // Retry once on failure (Modal cold start can cause first request to fail)
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        res = await fetch(API.train.start + endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        break;
+      } catch (fetchErr) {
+        if (attempt === 0) {
+          btn.textContent = 'CONNECTING...';
+          await new Promise(r => setTimeout(r, 3000));
+        } else {
+          throw fetchErr;
+        }
+      }
+    }
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+      errorEl.textContent = data.detail || data.message || 'Authentication failed';
+      return;
+    }
+    
+    // Save auth
+    authToken = data.token;
+    authUser = { user_id: data.user_id, email: data.email };
+    localStorage.setItem('forge_token', authToken);
+    localStorage.setItem('forge_user', JSON.stringify(authUser));
+    
+    showApp(data.email);
+    toast(mode === 'login' ? 'Signed in' : 'Account created');
+    
+    // Reload LoRAs for this user
+    fetchAvailableLoras();
+  } catch (err) {
+    errorEl.textContent = 'Connection failed — server may be starting up. Try again in a few seconds.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = mode === 'login' ? 'SIGN IN' : 'CREATE ACCOUNT';
+  }
+}
+
+function handleLogout() {
+  if (!confirm('Sign out?')) return;
+  localStorage.removeItem('forge_token');
+  localStorage.removeItem('forge_user');
+  authToken = null;
+  authUser = null;
+  showAuth();
+}
+
+// Add auth header to all API calls (except auth endpoints themselves)
+const _originalFetch = window.fetch;
+window.fetch = function(url, options = {}) {
+  if (authToken && typeof url === 'string' && url.includes('modal.run') && !url.includes('/auth/')) {
+    options.headers = options.headers || {};
+    if (typeof options.headers === 'object' && !Array.isArray(options.headers)) {
+      options.headers['Authorization'] = 'Bearer ' + authToken;
+    }
+  }
+  return _originalFetch.call(this, url, options);
+};
+
+// Handle Enter key in auth form
+document.getElementById('authPassword')?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') handleAuth();
+});
+document.getElementById('authEmail')?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('authPassword').focus();
+});
+
+
+
+// ═══════════════════════════════════════════════════
+// AUTH 3D SCENE
+// ═══════════════════════════════════════════════════
+var authScene, authCamera, authRenderer, authModel, authAnimFrame;
+
+function initAuth3D() {
+  console.log('initAuth3D called, threeReady:', window.__threeReady);
+  if (!window.__threeReady) { setTimeout(initAuth3D, 200); return; }
+  
+  var canvas = document.getElementById('authCanvas');
+  if (!canvas) { console.error('No authCanvas'); return; }
+  if (canvas.width > 400) { return; } // already initialized
+  
+  authScene = new THREE.Scene();
+  authScene.background = new THREE.Color(0xFAFAFA);
+  
+  authCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 100);
+  authCamera.position.set(0, 1.2, 3.5);
+  authCamera.lookAt(0, 0.4, 0);
+  
+  authRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  authRenderer.setSize(window.innerWidth, window.innerHeight);
+  authRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  authRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+  authRenderer.toneMappingExposure = 1.4;
+  authRenderer.outputEncoding = THREE.sRGBEncoding;
+  
+  // Dramatic studio lighting
+  const ambient = new THREE.AmbientLight(0xffffff, 0.3);
+  authScene.add(ambient);
+  
+  const key = new THREE.DirectionalLight(0xffffff, 1.2);
+  key.position.set(4, 6, 3);
+  key.castShadow = true;
+  authScene.add(key);
+  
+  const fill = new THREE.DirectionalLight(0xffffff, 0.3);
+  fill.position.set(-3, 2, -2);
+  authScene.add(fill);
+  
+  const rim = new THREE.DirectionalLight(0xffffff, 0.6);
+  rim.position.set(-1, 3, -4);
+  authScene.add(rim);
+  
+  // Subtle ground plane
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 20),
+    new THREE.MeshStandardMaterial({ color: 0xF0F0F0, roughness: 0.9 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.01;
+  authScene.add(ground);
+  
+  // Load the shoe model (Draco-compressed Hunyuan shoe)
+  const loader = new THREE.GLTFLoader();
+  const dracoLoader = new THREE.DRACOLoader();
+  dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/libs/draco/');
+  loader.setDRACOLoader(dracoLoader);
+  loader.load('shoe-hero.glb', (gltf) => {
+    authModel = gltf.scene;
+    console.log('Auth 3D model loaded, children:', authModel.children.length);
+    
+    // Keep original materials if they exist, otherwise apply matte
+    var hasTextures = false;
+    authModel.traverse(function(child) {
+      if (child.isMesh && child.material && child.material.map) hasTextures = true;
+    });
+    if (!hasTextures) {
+      var mat = new THREE.MeshStandardMaterial({
+        color: 0x1a1a1a,
+        roughness: 0.85,
+        metalness: 0.05,
+        side: THREE.DoubleSide,
+      });
+      authModel.traverse(function(child) {
+        if (child.isMesh) {
+          child.material = mat;
+          if (child.geometry) child.geometry.computeVertexNormals();
+        }
+      });
+    }
+    
+    // Center and scale
+    const box = new THREE.Box3().setFromObject(authModel);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const sc = 1.6 / maxDim;
+    authModel.scale.multiplyScalar(sc);
+    authModel.position.sub(center.multiplyScalar(sc));
+    authModel.position.y += size.y * sc / 2;
+    
+    // Create a pair — mirror the second shoe
+    var authModel2 = authModel.clone();
+    authModel2.scale.x *= -1; // mirror on X axis
+    
+    // Position as a pair — diagonal layout like a lookbook shot
+    var spacing = size.x * sc * 0.9;
+    authModel.position.x -= spacing * 0.5;
+    authModel.position.z += spacing * 0.15;
+    authModel2.position.x += spacing * 0.5;
+    authModel2.position.z -= spacing * 0.15;
+    
+    // Both facing same direction — the mirror already flips the form
+    authModel.rotation.y = -0.3;
+    authModel2.rotation.y = 0.3;
+    
+    console.log('Auth shoe pair positioned');
+    
+    authScene.add(authModel);
+    authScene.add(authModel2);
+    window._authModel2 = authModel2; // keep reference for scroll rotation
+    
+  }, 
+  (progress) => { console.log('Loading:', Math.round(progress.loaded / progress.total * 100) + '%'); },
+  (error) => { console.error('GLB load error:', error); });
+  
+  // Scroll-driven rotation
+  const content = document.querySelector('.auth-content');
+  if (content) {
+    content.addEventListener('scroll', () => {
+      const scrollY = content.scrollTop;
+      const maxScroll = content.scrollHeight - content.clientHeight;
+      const progress = scrollY / maxScroll;
+      
+      if (authModel) {
+        var rotAmount = progress * Math.PI * 0.4;
+        authModel.rotation.y = -0.3 + rotAmount;
+        if (window._authModel2) window._authModel2.rotation.y = 0.3 + rotAmount;
+      }
+      
+      // Move camera on scroll
+      authCamera.position.x = progress * -1.5;
+      authCamera.position.y = 1.2 - progress * 0.4;
+      authCamera.lookAt(0, 0.4 - progress * 0.2, 0);
+      
+      // Fade scroll hint
+      const hint = document.getElementById('authScrollHint');
+      if (hint) hint.classList.toggle('faded', progress > 0.1);
+    });
+  }
+  
+  // Gentle idle rotation
+  let idleAngle = 0;
+  function animateAuth() {
+    authAnimFrame = requestAnimationFrame(animateAuth);
+    idleAngle += 0.002;
+    if (authModel && !document.querySelector('.auth-content')?.scrollTop) {
+      var sway = Math.sin(idleAngle) * 0.08;
+      authModel.rotation.y = -0.3 + sway;
+      if (window._authModel2) window._authModel2.rotation.y = 0.3 + sway;
+    }
+    authRenderer.render(authScene, authCamera);
+  }
+  animateAuth();
+  
+  // Resize
+  window.addEventListener('resize', () => {
+    if (!authRenderer) return;
+    authCamera.aspect = window.innerWidth / window.innerHeight;
+    authCamera.updateProjectionMatrix();
+    authRenderer.setSize(window.innerWidth, window.innerHeight);
+  });
+}
+
+function destroyAuth3D() {
+  if (authAnimFrame) cancelAnimationFrame(authAnimFrame);
+  if (authRenderer) authRenderer.dispose();
+  authScene = authCamera = authRenderer = authModel = null;
+}
+
+// Init auth on load
+console.log('Running initAuth + initAuth3D');
+initAuth();
+// Ensure 3D scene initializes regardless of script timing
+if (document.readyState === 'complete') {
+  initAuth3D();
+} else {
+  window.addEventListener('load', initAuth3D);
+}
+// Safety net retries
+setTimeout(initAuth3D, 1000);
+setTimeout(initAuth3D, 3000);
+
 </script>
 
 <!-- Image Lightbox -->

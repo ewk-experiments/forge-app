@@ -1989,6 +1989,19 @@ html, body {
 </head>
 <body>
 
+<!-- Mobile notice -->
+<div id="mobileNotice" style="display:none;position:fixed;inset:0;z-index:99999;background:#FFFFFF;align-items:center;justify-content:center;flex-direction:column;gap:16px;font-family:'JetBrains Mono',monospace;">
+  <span style="font-size:14px;letter-spacing:0.12em;text-transform:uppercase;color:#0A0A0A;font-weight:300;">forge</span>
+  <span style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#999999;">desktop experience only</span>
+  <span style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#999999;">mobile coming soon</span>
+</div>
+<style>
+  @media (max-width: 1024px) {
+    #mobileNotice { display: flex !important; }
+    .auth-overlay, .app-layout, #authOverlay { display: none !important; }
+  }
+</style>
+
 <!-- Auth Overlay — Premium Brutalist -->
 <div class="auth-overlay" id="authOverlay">
   <!-- 3D Model Background (with image fallback) -->

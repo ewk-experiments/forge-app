@@ -2227,7 +2227,7 @@ html, body {
         </div>
         <div class="param-group">
           <span class="param-label">Steps<span class="tip-text">How many refinement passes. More steps = more detail but slower. 4 is optimized for this model.</span></span>
-          <input type="number" class="param-input" id="s1Steps" value="4">
+          <input type="number" class="param-input" id="s1Steps" value="28">
         </div>
       </div>
       <button class="btn-generate" id="s1GenerateBtn" onclick="generateStep1()">Generate</button>
@@ -2628,7 +2628,7 @@ html, body {
 // ═══════════════════════════════════════════════════
 const API = {
   flux: {
-    generate: 'https://heyitskim-ai--flux2-klein-shoe-fluxkleinservice-generate.modal.run',
+    generate: 'https://heyitskim-ai--flux-krea-shoe-fluxkreaservice-generate.modal.run',
     edit: 'https://heyitskim-ai--flux2-klein-shoe-fluxkleinservice-edit.modal.run',
     multiview: 'https://heyitskim-ai--flux2-klein-shoe-fluxkleinservice-multiview.modal.run',
   },
@@ -2734,8 +2734,8 @@ async function generateStep1() {
         width: 1024,
         height: 1024,
         seed: parseInt(document.getElementById('s1Seed').value) || 42,
-        steps: parseInt(document.getElementById('s1Steps').value) || 4,
-        guidance_scale: 1.0,
+        steps: parseInt(document.getElementById('s1Steps').value) || 28,
+        guidance_scale: 4.5,
         lora_name: document.getElementById('s1LoraSelect').value || state.trainedLora || undefined,
       }),
     });

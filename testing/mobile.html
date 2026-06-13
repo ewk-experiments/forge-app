@@ -755,7 +755,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 // ═══════════════════════════════════════════════════
 const API = {
   flux: {
-    generate: 'https://heyitskim-ai--flux2-klein-shoe-fluxkleinservice-generate.modal.run',
+    generate: 'https://heyitskim-ai--flux-krea-shoe-fluxkreaservice-generate.modal.run',
     multiview: 'https://heyitskim-ai--flux2-klein-shoe-fluxkleinservice-multiview.modal.run',
   },
   hunyuan: {
@@ -765,7 +765,8 @@ const API = {
     analyze: 'https://heyitskim-ai--forge-vision-visionservice-analyze.modal.run',
   },
 };
-// NOTE: flux.generate is auto-swapped to FLUX.1 Krea once that endpoint is live (see UPGRADE-REPORT.md).
+// Step 1 now runs FLUX.1 Krea [dev] (L40S, ~$0.01/gen) — upgraded from Klein.
+// multiview still uses Klein's edit pipeline (it's tuned for view consistency).
 
 const PHOTO_SUFFIX = ', right shoe only, right side profile view, perfectly orthogonal lateral view, product photography, centered on clean white background, studio lighting, e-commerce product shot, sharp focus, no 3/4 angle';
 
@@ -966,7 +967,7 @@ async function startForge() {
       track(8);
       const prompt = buildPrompt($('promptInput').value.trim());
       const genData = await call(API.flux.generate, {
-        prompt, width: 1024, height: 1024, seed: rand(), steps: 4, guidance_scale: 1.0,
+        prompt, width: 1024, height: 1024, seed: rand(), steps: 28, guidance_scale: 4.5,
       });
       if (!genData.image) throw new Error('No image returned');
       state.refImage = genData.image;

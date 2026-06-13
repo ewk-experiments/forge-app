@@ -2,6 +2,29 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+/* ── Device router ──────────────────────────────────────────────
+   Phones get the mobile-first experience (mobile.html).
+   Desktop keeps the full studio. Same URL, device-adaptive.
+   Override: ?desktop=1 forces studio, ?mobile=1 forces mobile.
+   Runs before paint so phones never load the heavy desktop app. */
+(function () {
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (qs.has('desktop')) { sessionStorage.setItem('forge_force', 'desktop'); }
+    if (qs.has('mobile'))  { sessionStorage.setItem('forge_force', 'mobile'); }
+    var force = sessionStorage.getItem('forge_force');
+    var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    var narrow = Math.min(window.innerWidth, window.innerHeight) <= 820;
+    var isPhone = coarse && narrow;
+    var goMobile = force === 'mobile' || (isPhone && force !== 'desktop');
+    if (goMobile && !/\/mobile\.html$/.test(location.pathname)) {
+      var base = location.pathname.replace(/index\.html$/, '').replace(/\/$/, '');
+      location.replace(base + '/mobile.html');
+    }
+  } catch (e) { /* fail open to desktop */ }
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ewk labs / forge</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -1989,18 +2012,7 @@ html, body {
 </head>
 <body>
 
-<!-- Mobile notice -->
-<div id="mobileNotice" style="display:none;position:fixed;inset:0;z-index:99999;background:#FFFFFF;align-items:center;justify-content:center;flex-direction:column;gap:16px;font-family:'JetBrains Mono',monospace;">
-  <span style="font-size:14px;letter-spacing:0.12em;text-transform:uppercase;color:#0A0A0A;font-weight:300;">forge</span>
-  <span style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#999999;">desktop experience only</span>
-  <span style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#999999;">mobile coming soon</span>
-</div>
-<style>
-  @media (max-width: 1024px) {
-    #mobileNotice { display: flex !important; }
-    .auth-overlay, .app-layout, #authOverlay { display: none !important; }
-  }
-</style>
+<!-- Mobile router lives in <head>; phones are redirected to mobile.html before this loads -->
 
 <!-- Auth Overlay — Premium Brutalist -->
 <div class="auth-overlay" id="authOverlay">
@@ -2215,7 +2227,7 @@ html, body {
         </div>
         <div class="param-group">
           <span class="param-label">Steps<span class="tip-text">How many refinement passes. More steps = more detail but slower. 4 is optimized for this model.</span></span>
-          <input type="number" class="param-input" id="s1Steps" value="4">
+          <input type="number" class="param-input" id="s1Steps" value="28">
         </div>
       </div>
       <button class="btn-generate" id="s1GenerateBtn" onclick="generateStep1()">Generate</button>
@@ -2616,7 +2628,7 @@ html, body {
 // ═══════════════════════════════════════════════════
 const API = {
   flux: {
-    generate: 'https://heyitskim-ai--flux2-klein-shoe-fluxkleinservice-generate.modal.run',
+    generate: 'https://heyitskim-ai--flux-krea-shoe-fluxkreaservice-generate.modal.run',
     edit: 'https://heyitskim-ai--flux2-klein-shoe-fluxkleinservice-edit.modal.run',
     multiview: 'https://heyitskim-ai--flux2-klein-shoe-fluxkleinservice-multiview.modal.run',
   },
@@ -2722,8 +2734,8 @@ async function generateStep1() {
         width: 1024,
         height: 1024,
         seed: parseInt(document.getElementById('s1Seed').value) || 42,
-        steps: parseInt(document.getElementById('s1Steps').value) || 4,
-        guidance_scale: 1.0,
+        steps: parseInt(document.getElementById('s1Steps').value) || 28,
+        guidance_scale: 4.5,
         lora_name: document.getElementById('s1LoraSelect').value || state.trainedLora || undefined,
       }),
     });

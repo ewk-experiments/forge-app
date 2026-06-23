@@ -3955,7 +3955,12 @@ async function startTraining() {
       phaseText.textContent = `COMPLETE — ${pollResult.lora_size ? (pollResult.lora_size / 1024 / 1024).toFixed(1) + ' MB' : 'LoRA saved'}`;
       state.trainedLora = styleName;
       document.querySelector('.step-tab[data-step="0"]').classList.add('completed');
-      document.getElementById('s1Prompt').value = `A futuristic shoe in the style of ${styleName}, product photography, white background`;
+      // Don't inject the trigger word into the visible prompt — the style is
+      // applied automatically via the Style dropdown. Keep the prompt clean.
+      var s1p = document.getElementById('s1Prompt');
+      if (!s1p.value.trim()) {
+        s1p.value = 'A futuristic shoe with architectural lines and a bold geometric sole';
+      }
       document.getElementById('s0Info').innerHTML = `<span style="color:var(--success)">Style "${styleName}" trained successfully.</span><br>Switch to Step 1 to generate with your style.`;
       setStatus('ready', 'IDLE');
       
@@ -4039,6 +4044,7 @@ function renderStyleLibrary(loras) {
       _loraData[l.name] = Object.assign({}, existing || {}, l);
       if (existingHasImgs && !incomingHasImgs) {
         _loraData[l.name].training_images = existing.training_images;
+        if (existing.training_images_full) _loraData[l.name].training_images_full = existing.training_images_full;
       }
     }
   });
@@ -4080,12 +4086,17 @@ function selectLibraryStyle(name) {
   var imgs = (lora && lora.training_images && lora.training_images.length > 0)
     ? lora.training_images
     : (lora && lora.sample_image ? [lora.sample_image] : []);
+  // High-quality versions for the lightbox (falls back to the small thumb)
+  var imgsFull = (lora && lora.training_images_full && lora.training_images_full.length > 0)
+    ? lora.training_images_full
+    : imgs;
 
   if (imgs.length > 0) {
     container.style.display = 'block';
     document.getElementById('s0Empty').style.display = 'none';
-    grid.innerHTML = imgs.map(function(img) {
-      return '<div onclick="event.stopPropagation(); openS0Lightbox(this.querySelector(\'img\').src)" style="aspect-ratio:1;background:var(--surface);border:1px solid var(--border);overflow:hidden;cursor:zoom-in"><img src="' + img + '" style="width:100%;height:100%;object-fit:cover;pointer-events:none"></div>';
+    grid.innerHTML = imgs.map(function(img, gi) {
+      var full = imgsFull[gi] || img;
+      return '<div onclick="event.stopPropagation(); openS0Lightbox(decodeURIComponent(this.dataset.full))" data-full="' + encodeURIComponent(full) + '" style="aspect-ratio:1;background:var(--surface);border:1px solid var(--border);overflow:hidden;cursor:zoom-in"><img src="' + img + '" style="width:100%;height:100%;object-fit:cover;pointer-events:none"></div>';
     }).join('');
     var realCount = (lora && lora.images_used) || imgs.length;
     document.getElementById('s0ImageCount').textContent = realCount + ' images (from saved style)';

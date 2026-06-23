@@ -2104,7 +2104,7 @@ html, body {
   <div class="topbar-steps">
     <div class="step-tab active" data-step="0" onclick="switchStep(0)">
       <span class="step-num">00</span>
-      <span class="step-name">Train</span>
+      <span class="step-name">Tune</span>
     </div>
     <div class="step-tab" data-step="1" onclick="switchStep(1)">
       <span class="step-num">01</span>
@@ -2138,7 +2138,7 @@ html, body {
       <div id="s0Grid" style="display:none;width:100%;height:100%;overflow-y:auto;padding:40px 16px 16px;display:none">
         <div id="s0ImageGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;align-content:start"></div>
       </div>
-      <span class="empty-state" id="s0Empty">Drop 20-50 reference images<br>to train your style</span>
+      <span class="empty-state" id="s0Empty">Drop 20-50 reference images<br>to tune your style</span>
       <button id="s0ToStep1" onclick="event.stopPropagation(); switchStep(1)" style="display:none;position:absolute;bottom:16px;right:16px;padding:6px 14px;background:var(--text);color:var(--bg);border:none;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;cursor:pointer;z-index:6;text-transform:uppercase">→ Generate</button>
     </div>
     <div class="s1-history" style="display:flex;flex-direction:column">
@@ -2179,7 +2179,7 @@ html, body {
         <span class="s1-prompt-label">Trigger Word</span>
         <input type="text" id="s0Trigger" value="in the style of [mystyle]" style="width:100%;padding:28px 16px 12px;background:none;border:none;color:var(--text);font-family:var(--font-ui);font-size:13px;font-weight:300;outline:none" readonly>
       </div>
-      <button class="btn-generate" id="s0TrainBtn" onclick="startTraining()" disabled>TRAIN</button>
+      <button class="btn-generate" id="s0TrainBtn" onclick="startTraining()" disabled>TUNE</button>
     </div>
   </div>
 </div>
@@ -3616,7 +3616,7 @@ async function startTraining() {
   const sessionId = 'train_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
   
   setStatus('generating', 'RUNNING');
-  document.getElementById('s0TrainBtn').textContent = 'TRAINING...';
+  document.getElementById('s0TrainBtn').textContent = 'TUNING...';
   document.getElementById('s0TrainBtn').disabled = true;
   
   // Show progress bar with simulated progress
@@ -3751,7 +3751,7 @@ async function startTraining() {
     toast('Error: ' + err.message);
     setStatus('error', 'ERROR');
   } finally {
-    document.getElementById('s0TrainBtn').textContent = 'TRAIN';
+    document.getElementById('s0TrainBtn').textContent = 'TUNE';
     document.getElementById('s0TrainBtn').disabled = s0Images.length < 5;
   }
 }

@@ -3847,7 +3847,10 @@ function selectLibraryStyle(name) {
     document.getElementById('s0ImageCount').textContent = lora.training_images.length + ' images (from saved style)';
   }
   
-  toast('Style "' + name + '" loaded');
+  // Preset is already tuned — reveal the path forward to Generate
+  document.getElementById('s0ToStep1').style.display = 'block';
+  
+  toast('Style "' + name + '" loaded — ready to generate');
 }
 
 async function deleteStyle(name) {

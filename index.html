@@ -186,12 +186,16 @@ html, body {
 .s1-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "command command"
+    "output  history";
   width: 100%;
   height: 100%;
 }
 
 .s1-output {
+  grid-area: output;
   border-right: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -227,6 +231,7 @@ html, body {
 }
 
 .s1-history {
+  grid-area: history;
   display: flex;
   flex-direction: column;
   background: var(--bg);
@@ -273,6 +278,16 @@ html, body {
 .s1-history-item.selected { border-color: var(--accent-active); border-width: 2px; }
 .s1-history-item img { width: 100%; height: 100%; object-fit: cover; }
 
+.s1-commandbar {
+  grid-area: command;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: stretch;
+  height: 84px;
+  background: var(--bg);
+}
+
+/* Legacy bottom-bar (still used by the Tune step's trigger-word row) */
 .s1-controls {
   grid-column: 1 / -1;
   border-top: 1px solid var(--border);
@@ -291,11 +306,11 @@ html, body {
 
 .s1-prompt-label {
   position: absolute;
-  top: 10px;
-  left: 16px;
+  top: 12px;
+  left: 18px;
   font-family: var(--font-mono);
   font-size: 9px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: var(--text-label);
   text-transform: uppercase;
   pointer-events: none;
@@ -304,12 +319,12 @@ html, body {
 
 .s1-prompt-area textarea {
   width: 100%;
-  padding: 28px 16px 12px;
+  padding: 30px 18px 14px;
   background: none;
   border: none;
   color: var(--text);
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 300;
   line-height: 1.5;
   resize: none;
@@ -323,14 +338,15 @@ html, body {
 .s1-params {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 0 16px;
+  gap: 18px;
+  padding: 0 20px;
+  border-right: 1px solid var(--border);
 }
 
 .param-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .param-label {
@@ -343,7 +359,7 @@ html, body {
 
 .param-input {
   width: 70px;
-  padding: 4px 8px;
+  padding: 5px 8px;
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
@@ -359,12 +375,12 @@ html, body {
 .param-input:focus { border-color: var(--text); }
 
 .btn-generate {
-  padding: 0 32px;
+  padding: 0 36px;
   height: 100%;
+  min-width: 150px;
   background: var(--text);
   color: var(--bg);
   border: none;
-  border-left: 1px solid var(--border);
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
@@ -378,6 +394,37 @@ html, body {
 .btn-generate:hover { background: var(--accent-active); }
 .btn-generate:disabled { opacity: 0.3; cursor: not-allowed; }
 .btn-generate:disabled:hover { background: var(--text); }
+
+/* STOP state — same button position, unmistakable */
+.btn-generate.is-stopping {
+  background: var(--accent);
+  color: #fff;
+  opacity: 1;
+  cursor: pointer;
+}
+.btn-generate.is-stopping:hover { background: var(--accent-active); }
+
+/* → Multi-View CTA: prominent, only visible after a successful generation */
+#s1ToStep2 {
+  display: none;
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  padding: 11px 20px;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  z-index: 3;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.16);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+#s1ToStep2:hover { background: var(--accent-active); transform: translateY(-1px); }
 
 /* ═══════════════════════════════════════════════════
    STEP 2 — MULTI-VIEW
@@ -2187,39 +2234,46 @@ html, body {
 <!-- Step 1: Generate -->
 <div class="step-panel" id="panel-1">
   <div class="s1-layout">
-    <div class="s1-output" id="s1Output">
-      <span class="cell-label-abs">OUTPUT</span>
-      <img id="s1OutputImg" src="" alt="" style="display:none">
-      <button id="s1ToStep2" onclick="event.stopPropagation(); switchStep(2)" style="display:none;position:absolute;bottom:16px;right:16px;padding:6px 14px;background:var(--text);color:var(--bg);border:none;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;cursor:pointer;z-index:2;text-transform:uppercase">→ Multi-View</button>
-      <span class="empty-state" id="s1Empty">Generate an image</span>
-    </div>
-    <div class="s1-history">
-      <div class="s1-history-label">HISTORY</div>
-      <div class="s1-history-grid" id="s1HistoryGrid"></div>
-    </div>
-    <div class="s1-controls">
+
+    <!-- TOP BAR: prompt + params + generate (single command row) -->
+    <div class="s1-commandbar">
       <div class="s1-prompt-area">
-        <span class="s1-prompt-label">Prompt</span>
-        <textarea id="s1Prompt" placeholder="Describe the shoe you want to create (right side profile view is added automatically)..." rows="2">A futuristic matte black rubber wedge sandal boot with architectural lines and bold geometric sole</textarea>
+        <span class="s1-prompt-label">Describe your shoe</span>
+        <textarea id="s1Prompt" placeholder="e.g. a futuristic matte black wedge sneaker with architectural lines… (right-side profile is added automatically)" rows="2">A futuristic matte black rubber wedge sandal boot with architectural lines and bold geometric sole</textarea>
       </div>
       <div class="s1-params">
         <div class="param-group">
-          <span class="param-label">Style<span class="tip-text">Trained LoRA style. Train one in Step 0, or select a previously trained style.</span></span>
-          <select class="param-input" id="s1LoraSelect" style="width:110px;font-family:var(--font-mono);font-size:10px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:4px 6px;cursor:pointer">
+          <span class="param-label">Style<span class="tip-text">Trained LoRA style. Train one in Tune, or pick a saved style.</span></span>
+          <select class="param-input" id="s1LoraSelect" style="width:128px;cursor:pointer">
             <option value="">None</option>
           </select>
         </div>
         <div class="param-group">
-          <span class="param-label">Seed<span class="tip-text">Controls randomness. Same seed + same prompt = same image. Change it to get variations.</span></span>
+          <span class="param-label">Seed<span class="tip-text">Same seed + prompt = same image. Change for variations.</span></span>
           <input type="number" class="param-input" id="s1Seed" value="42">
         </div>
         <div class="param-group">
-          <span class="param-label">Steps<span class="tip-text">How many refinement passes. More steps = more detail but slower. 4 is optimized for this model.</span></span>
+          <span class="param-label">Steps<span class="tip-text">More steps = more detail but slower.</span></span>
           <input type="number" class="param-input" id="s1Steps" value="28">
         </div>
       </div>
       <button class="btn-generate" id="s1GenerateBtn" onclick="generateStep1()">Generate</button>
     </div>
+
+    <!-- OUTPUT canvas -->
+    <div class="s1-output" id="s1Output">
+      <span class="cell-label-abs">OUTPUT</span>
+      <img id="s1OutputImg" src="" alt="" style="display:none">
+      <span class="empty-state" id="s1Empty">Write a prompt above, then hit Generate</span>
+      <button id="s1ToStep2" onclick="event.stopPropagation(); switchStep(2)">Make 3D-ready views →</button>
+    </div>
+
+    <!-- HISTORY rail -->
+    <div class="s1-history">
+      <div class="s1-history-label">HISTORY</div>
+      <div class="s1-history-grid" id="s1HistoryGrid"></div>
+    </div>
+
   </div>
 </div>
 
@@ -2706,11 +2760,17 @@ async function generateStep1() {
   state.s1.generating = true;
   state.s1.abortController = new AbortController();
   setStatus('generating', 'RUNNING');
-  document.getElementById('s1GenerateBtn').textContent = 'STOP';
-  document.getElementById('s1GenerateBtn').onclick = () => { if (state.s1.abortController) state.s1.abortController.abort(); };
+  const genBtn = document.getElementById('s1GenerateBtn');
+  genBtn.textContent = 'STOP';
+  genBtn.classList.add('is-stopping');
+  genBtn.onclick = () => { if (state.s1.abortController) state.s1.abortController.abort(); };
+  // Hide the Multi-View CTA while generating (only valid after a finished image)
+  document.getElementById('s1ToStep2').style.display = 'none';
+  // Clear any "selected from history" highlight — nothing is locked-in while generating
+  document.querySelectorAll('.s1-history-item').forEach(el => el.classList.remove('selected'));
   document.getElementById('s1OutputImg').style.display = 'none';
   document.getElementById('s1Empty').style.display = 'none';
-  document.getElementById('s1Output').insertAdjacentHTML('beforeend', `<div id="s1Loader" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">${dotMatrixHTML(1)}</div>`);
+  document.getElementById('s1Output').insertAdjacentHTML('beforeend', `<div id="s1Loader" style="position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center">${dotMatrixHTML(1)}<span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-label);text-transform:uppercase">Generating… this can take 20–40s</span></div>`);
 
   try {
     const res = await fetchWithRetry(API.flux.generate, {
@@ -2778,17 +2838,29 @@ async function generateStep1() {
     
     setStatus('ready', 'COMPLETE');
   } catch (err) {
-    toast('Error: ' + err.message);
+    const aborted = err.name === 'AbortError';
+    if (!aborted) toast('Error: ' + err.message);
     const loader = document.getElementById('s1Loader');
     if (loader) loader.remove();
-    document.getElementById('s1Empty').style.display = '';
-    setStatus('error', 'ERROR');
+    // If we have a previously selected image, keep showing it; else show empty state
+    if (state.s1.selectedIndex >= 0 && state.s1.images[state.s1.selectedIndex]) {
+      const img = document.getElementById('s1OutputImg');
+      img.src = state.s1.images[state.s1.selectedIndex];
+      img.style.display = 'block';
+      document.getElementById('s1ToStep2').style.display = 'block';
+      document.querySelectorAll('.s1-history-item').forEach((el, i) => el.classList.toggle('selected', i === state.s1.selectedIndex));
+    } else {
+      document.getElementById('s1Empty').style.display = '';
+    }
+    setStatus(aborted ? 'ready' : 'error', aborted ? 'STOPPED' : 'ERROR');
   } finally {
     state.s1.generating = false;
     state.s1.abortController = null;
-    document.getElementById('s1GenerateBtn').disabled = false;
-    document.getElementById('s1GenerateBtn').textContent = 'GENERATE';
-    document.getElementById('s1GenerateBtn').onclick = generateStep1;
+    const genBtn = document.getElementById('s1GenerateBtn');
+    genBtn.disabled = false;
+    genBtn.textContent = 'GENERATE';
+    genBtn.classList.remove('is-stopping');
+    genBtn.onclick = generateStep1;
   }
 }
 

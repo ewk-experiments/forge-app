@@ -186,10 +186,11 @@ html, body {
 .s1-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto 1fr auto;
   grid-template-areas:
     "command command"
-    "output  history";
+    "output  history"
+    "action  action";
   width: 100%;
   height: 100%;
 }
@@ -277,6 +278,25 @@ html, body {
 .s1-history-item:hover { border-color: var(--text); }
 .s1-history-item.selected { border-color: var(--accent-active); border-width: 2px; }
 .s1-history-item img { width: 100%; height: 100%; object-fit: cover; }
+
+/* “+ NEW” tile: deselect + return to Generate mode */
+.s1-history-new {
+  aspect-ratio: 1;
+  background: var(--bg);
+  border: 1px dashed var(--border-strong);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+.s1-history-new:hover { border-color: var(--text); background: var(--surface); }
+.s1-history-new span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-label);
+}
 
 .s1-commandbar {
   grid-area: command;
@@ -404,27 +424,36 @@ html, body {
 }
 .btn-generate.is-stopping:hover { background: var(--accent-active); }
 
-/* → Multi-View CTA: prominent, only visible after a successful generation */
-#s1ToStep2 {
-  display: none;
-  position: absolute;
-  bottom: 18px;
-  right: 18px;
-  padding: 11px 20px;
+/* BOTTOM ACTION BAR — single state-aware primary button */
+.s1-actionbar {
+  grid-area: action;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: stretch;
+  height: 64px;
+  background: var(--bg);
+}
+.s1-action-hint {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-label);
+  text-transform: uppercase;
+}
+.s1-actionbar .btn-generate {
+  height: 100%;
+  min-width: 240px;
+}
+/* When a shoe is selected, the action button becomes the “Make 3D Views” CTA */
+.btn-generate.is-advance {
   background: var(--text);
   color: var(--bg);
-  border: none;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  z-index: 3;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.16);
-  transition: background 0.15s ease, transform 0.15s ease;
 }
-#s1ToStep2:hover { background: var(--accent-active); transform: translateY(-1px); }
+.btn-generate.is-advance:hover { background: var(--accent-active); }
 
 /* ═══════════════════════════════════════════════════
    STEP 2 — MULTI-VIEW
@@ -650,6 +679,18 @@ html, body {
   align-items: stretch;
   height: 80px;
 }
+.s2-action-hint {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-label);
+  text-transform: uppercase;
+}
+.s2-controls .btn-generate { min-width: 200px; }
 
 /* ═══════════════════════════════════════════════════
    STEP 3 — 3D MODEL
@@ -2222,10 +2263,8 @@ html, body {
       </div>
     </div>
     <div class="s1-controls">
-      <div class="s1-prompt-area">
-        <span class="s1-prompt-label">Trigger Word</span>
-        <input type="text" id="s0Trigger" value="in the style of [mystyle]" style="width:100%;padding:28px 16px 12px;background:none;border:none;color:var(--text);font-family:var(--font-ui);font-size:13px;font-weight:300;outline:none" readonly>
-      </div>
+      <input type="hidden" id="s0Trigger" value="in the style of [mystyle]">
+      <div style="flex:1;display:flex;align-items:center;padding:0 18px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;color:var(--text-label)" id="s0BottomHint">Drop reference images or pick a saved style →</div>
       <button class="btn-generate" id="s0TrainBtn" onclick="s0PrimaryAction()" disabled>TUNE</button>
     </div>
   </div>
@@ -2235,7 +2274,7 @@ html, body {
 <div class="step-panel" id="panel-1">
   <div class="s1-layout">
 
-    <!-- TOP BAR: prompt + params + generate (single command row) -->
+    <!-- TOP BAR: prompt + params (no button) -->
     <div class="s1-commandbar">
       <div class="s1-prompt-area">
         <span class="s1-prompt-label">Describe your shoe</span>
@@ -2257,21 +2296,29 @@ html, body {
           <input type="number" class="param-input" id="s1Steps" value="28">
         </div>
       </div>
-      <button class="btn-generate" id="s1GenerateBtn" onclick="generateStep1()">Generate</button>
     </div>
 
     <!-- OUTPUT canvas -->
     <div class="s1-output" id="s1Output">
       <span class="cell-label-abs">OUTPUT</span>
       <img id="s1OutputImg" src="" alt="" style="display:none">
-      <span class="empty-state" id="s1Empty">Write a prompt above, then hit Generate</span>
-      <button id="s1ToStep2" onclick="event.stopPropagation(); switchStep(2)">Make 3D-ready views →</button>
+      <span class="empty-state" id="s1Empty">Write a prompt below, then hit Generate</span>
     </div>
 
     <!-- HISTORY rail -->
     <div class="s1-history">
       <div class="s1-history-label">HISTORY</div>
-      <div class="s1-history-grid" id="s1HistoryGrid"></div>
+      <div class="s1-history-grid" id="s1HistoryGrid">
+        <div class="s1-history-new" id="s1NewTile" onclick="s1Deselect()" title="Start a new shoe">
+          <span>+ NEW</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM ACTION BAR: single state-aware button -->
+    <div class="s1-actionbar">
+      <div class="s1-action-hint" id="s1ActionHint">Write a prompt and generate your first shoe</div>
+      <button class="btn-generate" id="s1GenerateBtn" onclick="s1PrimaryAction()">Generate</button>
     </div>
 
   </div>
@@ -2285,7 +2332,7 @@ html, body {
       <img id="s2RefImg" src="" alt="" style="display:none">
       <span class="thumb-remove" id="s2RefRemove" style="display:none" onclick="event.stopPropagation(); clearS2Ref()">&times;</span>
       <span class="empty-state" id="s2RefEmpty" style="font-size:24px;color:var(--border-strong)">+</span>
-      <button id="s2ToStep3" onclick="event.stopPropagation(); switchStep(3)" style="display:none;position:absolute;bottom:16px;right:16px;padding:6px 14px;background:var(--text);color:var(--bg);border:none;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;cursor:pointer;z-index:6;text-transform:uppercase">→ 3D Model</button>
+      <button id="s2ToStep3" onclick="event.stopPropagation(); switchStep(3)" style="display:none;position:absolute;bottom:18px;right:18px;padding:11px 20px;background:var(--text);color:var(--bg);border:none;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:0.08em;cursor:pointer;z-index:6;text-transform:uppercase;box-shadow:0 4px 20px rgba(0,0,0,0.16)">Build 3D Model →</button>
       <div class="analyzing-overlay" id="s2Analyzing" style="display:none">
         <div class="dot-matrix pattern-1"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
         <span class="analyzing-text">Analyzing product...</span>
@@ -2308,17 +2355,10 @@ html, body {
       <div class="view-content" id="viewBottom"></div>
     </div>
     <div class="s2-controls">
-      <div class="s1-prompt-area" style="flex:2">
-        <span class="s1-prompt-label">Product Description</span>
-        <textarea id="s2Prompt" placeholder="Describe the product for better views (e.g., 'matte black rubber wedge boot with geometric sole, open toe, architectural heel column, minimalist Balenciaga aesthetic')..." rows="2"></textarea>
-      </div>
-      <div class="s1-params">
-        <div class="param-group">
-          <span class="param-label">Seed<span class="tip-text">Controls randomness for view generation. Lock it to keep consistent results across regenerations.</span></span>
-          <input type="number" class="param-input" id="s2Seed" value="42">
-        </div>
-      </div>
-      <button class="btn-generate" id="s2GenerateBtn" onclick="generateStep2()">Generate Views</button>
+      <input type="hidden" id="s2Prompt" value="">
+      <input type="hidden" id="s2Seed" value="42">
+      <div class="s2-action-hint" id="s2ActionHint">Generating 4 orthographic views…</div>
+      <button class="btn-generate" id="s2GenerateBtn" onclick="generateStep2()">Regenerate Views</button>
     </div>
   </div>
 </div>
@@ -2702,7 +2742,8 @@ const state = {
 // ═══════════════════════════════════════════════════
 // STEP SWITCHING
 // ═══════════════════════════════════════════════════
-function switchStep(n) {
+function switchStep(n, opts) {
+  opts = opts || {};
   state.step = n;
   document.querySelectorAll('.step-tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.step) === n));
   document.querySelectorAll('.step-panel').forEach(p => p.classList.toggle('active', p.id === `panel-${n}`));
@@ -2716,6 +2757,22 @@ function switchStep(n) {
       el.src = img;
       el.style.display = 'block';
       document.getElementById('s2RefEmpty').style.display = 'none'; document.getElementById('s2RefRemove').style.display = 'block';
+    }
+    // Auto-start view generation when arriving via "Make 3D Views"
+    if (opts.autoGenerate && state.s2.refImage && !state.s2.generating) {
+      // Ensure the (hidden) description is populated from the Step 1 prompt
+      const s2p = document.getElementById('s2Prompt');
+      if (s2p && !s2p.value.trim()) {
+        const base = (document.getElementById('s1Prompt').value || '').replace(/,?\s*product photography.*$/i, '').replace(/,?\s*e-commerce.*$/i, '').replace(/,?\s*studio lighting.*$/i, '').replace(/,?\s*clean white background.*$/i, '').trim();
+        s2p.value = base;
+      }
+      // Only auto-run if views aren't already done for this ref
+      const alreadyDone = state.s2.views && state.s2.views.front && state.s2.views.back;
+      if (!alreadyDone) {
+        const hint = document.getElementById('s2ActionHint');
+        if (hint) hint.textContent = 'Generating 4 orthographic views…';
+        setTimeout(() => generateStep2(), 350);
+      }
     }
   }
 
@@ -2740,6 +2797,43 @@ function switchStep(n) {
 // ═══════════════════════════════════════════════════
 // STEP 1 — GENERATE
 // ═══════════════════════════════════════════════════
+
+// Single state-aware bottom button:
+//  - no shoe selected  → "Generate"  → generates a new image
+//  - a shoe selected    → "Make 3D Views" → jumps to Multi-View and auto-renders
+function s1PrimaryAction() {
+  if (state.s1.generating) {
+    if (state.s1.abortController) state.s1.abortController.abort();
+    return;
+  }
+  const hasSelection = state.s1.selectedIndex >= 0 && state.s1.images[state.s1.selectedIndex];
+  if (hasSelection) {
+    // Advance to Multi-View and immediately start rendering the 3D-ready views
+    switchStep(2, { autoGenerate: true });
+  } else {
+    generateStep1();
+  }
+}
+
+// Keep the bottom button label/style in sync with selection state
+function s1UpdateActionButton() {
+  const btn = document.getElementById('s1GenerateBtn');
+  const hint = document.getElementById('s1ActionHint');
+  if (!btn) return;
+  if (state.s1.generating) return; // generating state is managed in generateStep1
+  const hasSelection = state.s1.selectedIndex >= 0 && state.s1.images[state.s1.selectedIndex];
+  if (hasSelection) {
+    btn.textContent = 'Make 3D Views →';
+    btn.classList.add('is-advance');
+    btn.classList.remove('is-stopping');
+    if (hint) hint.textContent = 'Shoe selected — generate variations or build 3D views';
+  } else {
+    btn.textContent = 'Generate';
+    btn.classList.remove('is-advance', 'is-stopping');
+    if (hint) hint.textContent = 'Write a prompt and generate your first shoe';
+  }
+}
+
 async function generateStep1() {
   if (state.s1.generating) return;
   const rawPrompt = document.getElementById('s1Prompt').value.trim();
@@ -2763,9 +2857,10 @@ async function generateStep1() {
   const genBtn = document.getElementById('s1GenerateBtn');
   genBtn.textContent = 'STOP';
   genBtn.classList.add('is-stopping');
+  genBtn.classList.remove('is-advance');
   genBtn.onclick = () => { if (state.s1.abortController) state.s1.abortController.abort(); };
-  // Hide the Multi-View CTA while generating (only valid after a finished image)
-  document.getElementById('s1ToStep2').style.display = 'none';
+  const aHint = document.getElementById('s1ActionHint');
+  if (aHint) aHint.textContent = 'Generating… you can stop anytime';
   // Clear any "selected from history" highlight — nothing is locked-in while generating
   document.querySelectorAll('.s1-history-item').forEach(el => el.classList.remove('selected'));
   document.getElementById('s1OutputImg').style.display = 'none';
@@ -2804,7 +2899,6 @@ async function generateStep1() {
     img.src = data.image;
     img.style.display = 'block';
     document.getElementById('s1Empty').style.display = 'none';
-    document.getElementById('s1ToStep2').style.display = 'block';
 
     // Add to history grid
     const thumb = document.createElement('div');
@@ -2836,6 +2930,7 @@ async function generateStep1() {
 
     // Auto-advance prompt
     
+    s1UpdateActionButton();
     setStatus('ready', 'COMPLETE');
   } catch (err) {
     const aborted = err.name === 'AbortError';
@@ -2847,7 +2942,6 @@ async function generateStep1() {
       const img = document.getElementById('s1OutputImg');
       img.src = state.s1.images[state.s1.selectedIndex];
       img.style.display = 'block';
-      document.getElementById('s1ToStep2').style.display = 'block';
       document.querySelectorAll('.s1-history-item').forEach((el, i) => el.classList.toggle('selected', i === state.s1.selectedIndex));
     } else {
       document.getElementById('s1Empty').style.display = '';
@@ -2858,9 +2952,9 @@ async function generateStep1() {
     state.s1.abortController = null;
     const genBtn = document.getElementById('s1GenerateBtn');
     genBtn.disabled = false;
-    genBtn.textContent = 'GENERATE';
     genBtn.classList.remove('is-stopping');
-    genBtn.onclick = generateStep1;
+    genBtn.onclick = s1PrimaryAction;
+    s1UpdateActionButton();
   }
 }
 
@@ -2870,10 +2964,19 @@ function selectHistoryItem(idx) {
   img.src = state.s1.images[idx];
   img.style.display = 'block';
   document.getElementById('s1Empty').style.display = 'none';
-  document.getElementById('s1ToStep2').style.display = 'block';
   document.querySelectorAll('.s1-history-item').forEach((el, i) => {
     el.classList.toggle('selected', i === idx);
   });
+  s1UpdateActionButton();
+}
+
+// Deselect the current shoe — returns the button to "Generate" mode
+function s1Deselect() {
+  state.s1.selectedIndex = -1;
+  document.getElementById('s1OutputImg').style.display = 'none';
+  document.getElementById('s1Empty').style.display = '';
+  document.querySelectorAll('.s1-history-item').forEach(el => el.classList.remove('selected'));
+  s1UpdateActionButton();
 }
 
 function dotMatrixHTML(pattern) {
@@ -3032,18 +3135,22 @@ async function generateStep2() {
 
     document.querySelector('.step-tab[data-step="2"]').classList.add('completed');
     document.getElementById('s2ToStep3').style.display = 'block';
+    const okHint = document.getElementById('s2ActionHint');
+    if (okHint) okHint.textContent = 'Views ready — continue to build the 3D model →';
     setStatus('ready', 'VIEWS COMPLETE');
   } catch (err) {
     toast('Error: ' + err.message);
     ['viewFront', 'viewBack', 'viewTop', 'viewBottom'].forEach(id => {
       document.getElementById(id).innerHTML = '';
     });
+    const eh = document.getElementById('s2ActionHint');
+    if (eh) eh.textContent = 'View generation failed — tap Regenerate to retry';
     setStatus('error', 'ERROR');
   } finally {
     state.s2.generating = false;
     state.s2.abortController = null;
     document.getElementById('s2GenerateBtn').disabled = false;
-    document.getElementById('s2GenerateBtn').textContent = 'GENERATE VIEWS';
+    document.getElementById('s2GenerateBtn').textContent = 'Regenerate Views';
     document.getElementById('s2GenerateBtn').onclick = generateStep2;
   }
 }
@@ -4054,8 +4161,8 @@ function loadHistory() {
       img.src = images[state.s1.selectedIndex];
       img.style.display = 'block';
       document.getElementById('s1Empty').style.display = 'none';
-      document.getElementById('s1ToStep2').style.display = 'block';
     }
+    s1UpdateActionButton();
     
     console.log(`Loaded ${images.length} images from history`);
   } catch(e) { console.log('History load failed:', e.message); }

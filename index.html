@@ -2179,7 +2179,7 @@ html, body {
         <span class="s1-prompt-label">Trigger Word</span>
         <input type="text" id="s0Trigger" value="in the style of [mystyle]" style="width:100%;padding:28px 16px 12px;background:none;border:none;color:var(--text);font-family:var(--font-ui);font-size:13px;font-weight:300;outline:none" readonly>
       </div>
-      <button class="btn-generate" id="s0TrainBtn" onclick="startTraining()" disabled>TUNE</button>
+      <button class="btn-generate" id="s0TrainBtn" onclick="s0PrimaryAction()" disabled>TUNE</button>
     </div>
   </div>
 </div>
@@ -3542,6 +3542,29 @@ async function fetchWithRetry(url, options, retries = 2, delayMs = 5000) {
 // ═══════════════════════════════════════════════════
 const s0Images = [];
 
+// CTA mode: 'upload' (tune new images) | 'preset' (style loaded → generate)
+var s0Mode = 'upload';
+
+// Set the primary CTA based on mode. In 'preset' mode the action is Generate,
+// not Tune (tuning only applies to freshly uploaded images).
+function setS0Mode(mode) {
+  s0Mode = mode;
+  var btn = document.getElementById('s0TrainBtn');
+  if (mode === 'preset') {
+    btn.textContent = '→ GENERATE';
+    btn.disabled = false;
+  } else {
+    btn.textContent = 'TUNE';
+    btn.disabled = s0Images.length < 5;
+  }
+}
+
+// Single dispatcher for the big CTA — branches on mode.
+function s0PrimaryAction() {
+  if (s0Mode === 'preset') { switchStep(1); return; }
+  startTraining();
+}
+
 // Drag & drop on Step 0
 const s0Drop = document.getElementById('s0DropZone');
 s0Drop.addEventListener('dragover', (e) => { e.preventDefault(); s0Drop.style.background = '#F0F0F0'; });
@@ -3590,7 +3613,8 @@ function renderS0Grid() {
   `).join('');
   
   document.getElementById('s0ImageCount').textContent = `${s0Images.length} images`;
-  document.getElementById('s0TrainBtn').disabled = s0Images.length < 5;
+  // User is working with their own uploads — this is the Tune path.
+  setS0Mode('upload');
   
   // Auto-scale steps: ~28 passes per image, min 500, max 5000
   if (s0Images.length >= 5) {
@@ -3751,8 +3775,7 @@ async function startTraining() {
     toast('Error: ' + err.message);
     setStatus('error', 'ERROR');
   } finally {
-    document.getElementById('s0TrainBtn').textContent = 'TUNE';
-    document.getElementById('s0TrainBtn').disabled = s0Images.length < 5;
+    setS0Mode('upload');
   }
 }
 
@@ -3871,6 +3894,9 @@ function selectLibraryStyle(name) {
     grid.innerHTML = '<div style="grid-column:1/-1;font-family:var(--font-mono);font-size:9px;color:var(--text-label);padding:16px;text-align:center">Style “' + name + '” loaded (preview unavailable)</div>';
     document.getElementById('s0ImageCount').textContent = ((lora && lora.images_used) || '?') + ' images (from saved style)';
   }
+
+  // Preset is already tuned — the primary action is now Generate, not Tune.
+  setS0Mode('preset');
 
   toast('Style "' + name + '" loaded');
 }

@@ -3576,7 +3576,11 @@ s0Drop.addEventListener('drop', (e) => {
   if (files.length) addS0Images(files);
 });
 
-s0Drop.addEventListener('click', () => {
+s0Drop.addEventListener('click', (e) => {
+  // Don't trigger upload when a preset/saved style is loaded — the panel is a
+  // gallery in that mode, not a dropzone. Also ignore clicks on thumbnails.
+  if (s0Mode === 'preset') return;
+  if (e.target.closest && e.target.closest('#s0ImageGrid')) return;
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
@@ -3587,6 +3591,25 @@ s0Drop.addEventListener('click', () => {
   };
   input.click();
 });
+
+// Lightbox: click any dataset thumbnail to view it larger.
+function openS0Lightbox(src) {
+  var lb = document.getElementById('s0Lightbox');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.id = 's0Lightbox';
+    lb.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(250,250,250,0.94);display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(4px)';
+    lb.onclick = function(){ lb.style.display = 'none'; };
+    var img = document.createElement('img');
+    img.id = 's0LightboxImg';
+    img.style.cssText = 'max-width:82vw;max-height:82vh;object-fit:contain;border:1px solid var(--border);box-shadow:0 8px 40px rgba(0,0,0,0.12)';
+    lb.appendChild(img);
+    document.body.appendChild(lb);
+    document.addEventListener('keydown', function(ev){ if(ev.key==='Escape' && lb.style.display!=='none') lb.style.display='none'; });
+  }
+  document.getElementById('s0LightboxImg').src = src;
+  lb.style.display = 'flex';
+}
 
 function addS0Images(files) {
   files.forEach(file => {
@@ -3606,8 +3629,8 @@ function renderS0Grid() {
   document.getElementById('s0Empty').style.display = 'none';
   
   grid.innerHTML = s0Images.map((img, i) => `
-    <div style="aspect-ratio:1;background:var(--surface);border:1px solid var(--border);overflow:hidden;position:relative">
-      <img src="${img.data}" style="width:100%;height:100%;object-fit:cover">
+    <div onclick="event.stopPropagation(); openS0Lightbox('${img.data}')" style="aspect-ratio:1;background:var(--surface);border:1px solid var(--border);overflow:hidden;position:relative;cursor:zoom-in">
+      <img src="${img.data}" style="width:100%;height:100%;object-fit:cover;pointer-events:none">
       <span class="thumb-remove" onclick="event.stopPropagation(); s0Images.splice(${i},1); renderS0Grid();">&times;</span>
     </div>
   `).join('');
@@ -3883,7 +3906,7 @@ function selectLibraryStyle(name) {
     container.style.display = 'block';
     document.getElementById('s0Empty').style.display = 'none';
     grid.innerHTML = imgs.map(function(img) {
-      return '<div style="aspect-ratio:1;background:var(--surface);border:1px solid var(--border);overflow:hidden"><img src="' + img + '" style="width:100%;height:100%;object-fit:cover"></div>';
+      return '<div onclick="event.stopPropagation(); openS0Lightbox(this.querySelector(\'img\').src)" style="aspect-ratio:1;background:var(--surface);border:1px solid var(--border);overflow:hidden;cursor:zoom-in"><img src="' + img + '" style="width:100%;height:100%;object-fit:cover;pointer-events:none"></div>';
     }).join('');
     var realCount = (lora && lora.images_used) || imgs.length;
     document.getElementById('s0ImageCount').textContent = realCount + ' images (from saved style)';

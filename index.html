@@ -2733,7 +2733,7 @@ const API = {
 // ═══════════════════════════════════════════════════
 const state = {
   step: 0,
-  s1: { images: [], selectedIndex: -1, generating: false },
+  s1: { images: [], serverIds: [], fullLoaded: [], selectedIndex: -1, generating: false },
   s2: { refImage: null, views: {}, generating: false, selectedView: null, analysis: null, analyzing: false },
   s3: { glbBlob: null, generating: false, scene: null },
   trainedLora: null,
@@ -2892,6 +2892,8 @@ async function generateStep1() {
 
     // Add to history
     state.s1.images.push(data.image);
+    state.s1.serverIds.push(null);
+    state.s1.fullLoaded.push(true);   // freshly generated → we already have full res
     state.s1.selectedIndex = state.s1.images.length - 1;
 
     // Show output
@@ -2921,6 +2923,9 @@ async function generateStep1() {
 
     // Save to localStorage
     saveHistory();
+
+    // Also persist to the account (synced across devices) when logged in
+    saveGenerationToAccount(data.image, prompt);
 
     // Carry prompt to Step 2 description for better views
     const s2Prompt = document.getElementById('s2Prompt');
@@ -2958,16 +2963,23 @@ async function generateStep1() {
   }
 }
 
-function selectHistoryItem(idx) {
+async function selectHistoryItem(idx) {
   state.s1.selectedIndex = idx;
   const img = document.getElementById('s1OutputImg');
-  img.src = state.s1.images[idx];
+  img.src = state.s1.images[idx];   // thumb or full — instant
   img.style.display = 'block';
   document.getElementById('s1Empty').style.display = 'none';
   document.querySelectorAll('.s1-history-item').forEach((el, i) => {
     el.classList.toggle('selected', i === idx);
   });
   s1UpdateActionButton();
+  // If this is a server-backed item we only have the thumb for, upgrade to full.
+  if (state.s1.serverIds && state.s1.serverIds[idx] && !(state.s1.fullLoaded && state.s1.fullLoaded[idx])) {
+    img.style.filter = 'blur(0.5px)';
+    await ensureFullImage(idx);
+    if (state.s1.selectedIndex === idx) img.src = state.s1.images[idx];
+    img.style.filter = '';
+  }
 }
 
 // Deselect the current shoe — returns the button to "Generate" mode
@@ -4172,6 +4184,8 @@ function loadHistory() {
     if (!Array.isArray(images) || images.length === 0) return;
     
     state.s1.images = images;
+    state.s1.serverIds = images.map(() => null);
+    state.s1.fullLoaded = images.map(() => true);
     const savedIdx = parseInt(localStorage.getItem('forge_selected') || '0');
     state.s1.selectedIndex = Math.min(savedIdx, images.length - 1);
     
@@ -4198,8 +4212,104 @@ function loadHistory() {
   } catch(e) { console.log('History load failed:', e.message); }
 }
 
-// Load on startup
-loadHistory();
+// ═══════════════════════════════════════════════════
+// ACCOUNT-BACKED HISTORY (synced across devices when logged in)
+// ═══════════════════════════════════════════════════
+
+// Save a generation to the signed-in user's account (fire-and-forget).
+async function saveGenerationToAccount(image, prompt) {
+  if (!authToken) return; // logged out → localStorage only
+  try {
+    const res = await fetch(API.train.start + '/generations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+      body: JSON.stringify({
+        image: image,
+        prompt: prompt || '',
+        seed: parseInt(document.getElementById('s1Seed').value) || null,
+        steps: parseInt(document.getElementById('s1Steps').value) || null,
+        lora: document.getElementById('s1LoraSelect').value || state.trainedLora || null,
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      // Tag the just-added grid item + state entry with its server id so it
+      // survives reloads and can be matched on next sync.
+      const i = state.s1.images.length - 1;
+      if (i >= 0) state.s1.serverIds[i] = data.id;
+    }
+  } catch(e) { console.log('Account save failed:', e.message); }
+}
+
+// Load the signed-in user's saved generations and rebuild the history grid.
+// Grid shows thumbnails; full images are fetched on demand when selected.
+async function loadAccountHistory() {
+  if (!authToken) return false;
+  try {
+    const res = await fetch(API.train.start + '/generations', {
+      headers: { 'Authorization': 'Bearer ' + authToken },
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    const gens = data.generations || [];
+    if (gens.length === 0) return false;
+
+    // Reset history state to the account's gallery.
+    state.s1.images = gens.map(g => g.thumb);   // placeholders (thumbs) until clicked
+    state.s1.serverIds = gens.map(g => g.id);
+    state.s1.fullLoaded = gens.map(() => false);
+    state.s1.selectedIndex = -1;
+
+    const grid = document.getElementById('s1HistoryGrid');
+    // Clear everything except the persistent "+ NEW" tile.
+    Array.from(grid.querySelectorAll('.s1-history-item')).forEach(el => el.remove());
+    gens.forEach((g, i) => {
+      const thumb = document.createElement('div');
+      thumb.className = 's1-history-item';
+      thumb.innerHTML = `<img src="${g.thumb}" alt="Generation ${i + 1}">`;
+      thumb.onclick = () => selectHistoryItem(i);
+      grid.appendChild(thumb);
+    });
+    s1UpdateActionButton();
+    console.log(`Loaded ${gens.length} generations from account`);
+    return true;
+  } catch(e) { console.log('Account history load failed:', e.message); return false; }
+}
+
+// Ensure state.s1.images[idx] holds the FULL image (not just the thumb).
+// Fetches from /generations/{id} the first time a server-backed item is opened.
+async function ensureFullImage(idx) {
+  if (!authToken) return state.s1.images[idx];
+  const id = state.s1.serverIds[idx];
+  if (!id || state.s1.fullLoaded[idx]) return state.s1.images[idx];
+  try {
+    const res = await fetch(API.train.start + '/generations/' + encodeURIComponent(id), {
+      headers: { 'Authorization': 'Bearer ' + authToken },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.image) {
+        state.s1.images[idx] = data.image;
+        state.s1.fullLoaded[idx] = true;
+      }
+    }
+  } catch(e) { console.log('Full image fetch failed:', e.message); }
+  return state.s1.images[idx];
+}
+
+// Load on startup: prefer the account gallery when signed in, else localStorage.
+// Deferred so the auth token (declared later via hoisted `var`) is initialized first.
+function initHistory() {
+  (async function() {
+    const loaded = await loadAccountHistory();
+    if (!loaded) loadHistory();
+  })();
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initHistory);
+} else {
+  setTimeout(initHistory, 0);
+}
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
@@ -4898,6 +5008,9 @@ async function handleAuth() {
     
     // Reload LoRAs for this user
     fetchAvailableLoras();
+
+    // Pull this account's saved generations (synced across devices)
+    loadAccountHistory();
   } catch (err) {
     errorEl.textContent = 'Connection failed — server may be starting up. Try again in a few seconds.';
   } finally {

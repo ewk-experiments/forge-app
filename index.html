@@ -3790,6 +3790,25 @@ function openS0Lightbox(src) {
   lb.style.display = 'flex';
 }
 
+// Open the lightbox with the thumb immediately, then fetch + swap the
+// high-resolution training image from the backend.
+async function openLibraryFullImage(styleName, idx, thumbSrc) {
+  openS0Lightbox(thumbSrc);  // instant preview
+  var imgEl = document.getElementById('s0LightboxImg');
+  if (imgEl) imgEl.style.filter = 'blur(1px)';
+  try {
+    var res = await fetch(API.train.start + '/loras/' + encodeURIComponent(styleName) + '/fullimage/' + idx);
+    if (res.ok) {
+      var data = await res.json();
+      if (data.image && imgEl) imgEl.src = data.image;
+    }
+  } catch (e) {
+    // keep the thumb if the fetch fails
+  } finally {
+    if (imgEl) imgEl.style.filter = '';
+  }
+}
+
 function addS0Images(files) {
   files.forEach(file => {
     const reader = new FileReader();
@@ -4044,7 +4063,6 @@ function renderStyleLibrary(loras) {
       _loraData[l.name] = Object.assign({}, existing || {}, l);
       if (existingHasImgs && !incomingHasImgs) {
         _loraData[l.name].training_images = existing.training_images;
-        if (existing.training_images_full) _loraData[l.name].training_images_full = existing.training_images_full;
       }
     }
   });
@@ -4086,17 +4104,18 @@ function selectLibraryStyle(name) {
   var imgs = (lora && lora.training_images && lora.training_images.length > 0)
     ? lora.training_images
     : (lora && lora.sample_image ? [lora.sample_image] : []);
-  // High-quality versions for the lightbox (falls back to the small thumb)
-  var imgsFull = (lora && lora.training_images_full && lora.training_images_full.length > 0)
-    ? lora.training_images_full
-    : imgs;
+  var hasFull = !!(lora && lora.has_full_images);
 
   if (imgs.length > 0) {
     container.style.display = 'block';
     document.getElementById('s0Empty').style.display = 'none';
     grid.innerHTML = imgs.map(function(img, gi) {
-      var full = imgsFull[gi] || img;
-      return '<div onclick="event.stopPropagation(); openS0Lightbox(decodeURIComponent(this.dataset.full))" data-full="' + encodeURIComponent(full) + '" style="aspect-ratio:1;background:var(--surface);border:1px solid var(--border);overflow:hidden;cursor:zoom-in"><img src="' + img + '" style="width:100%;height:100%;object-fit:cover;pointer-events:none"></div>';
+      // If high-res previews exist on the backend, fetch on click; otherwise
+      // just open the thumb we already have.
+      var onclick = hasFull
+        ? "event.stopPropagation(); openLibraryFullImage('" + name + "', " + gi + ", this.querySelector('img').src)"
+        : "event.stopPropagation(); openS0Lightbox(this.querySelector('img').src)";
+      return '<div onclick="' + onclick + '" style="aspect-ratio:1;background:var(--surface);border:1px solid var(--border);overflow:hidden;cursor:zoom-in"><img src="' + img + '" style="width:100%;height:100%;object-fit:cover;pointer-events:none"></div>';
     }).join('');
     var realCount = (lora && lora.images_used) || imgs.length;
     document.getElementById('s0ImageCount').textContent = realCount + ' images (from saved style)';
